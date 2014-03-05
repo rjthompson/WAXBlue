@@ -1,21 +1,21 @@
 package com.rt.WAXBlue;
 
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
-import android.app.Activity;
 import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 public class MainActivity extends Activity {
 
@@ -55,17 +55,19 @@ public class MainActivity extends Activity {
      */
     private void init(){
 
-        if(!checkBluetooth()){
-            finish();
-            //TODO make sure no other options
 
-        }
 
         ListView pairedDeviceListView = (ListView) this.findViewById(R.id.deviceListView);
 
         addedDevicesList = new ArrayList<DeviceToBeAdded>();
 
         pairedDevicesList = new ArrayList<String>();
+
+        if (!checkBluetooth()) {
+            finish();
+            //TODO make sure no other options
+
+        }
 
         deviceDisplayArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, pairedDevicesList);
 

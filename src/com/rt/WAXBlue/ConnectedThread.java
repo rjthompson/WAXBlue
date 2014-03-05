@@ -1,11 +1,11 @@
 package com.rt.WAXBlue;
 
-import java.io.*;
-
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
+
+import java.io.*;
 
 public class ConnectedThread extends Thread {
 
