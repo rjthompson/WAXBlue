@@ -284,23 +284,32 @@ public class MainActivity extends Activity {
         //Remove the paired devices list
         ((RelativeLayout) pairedDeviceListView.getParent()).removeView(pairedDeviceListView);
 
-        View clearAll = findViewById(R.id.clearButton);
-        View clear = findViewById(R.id.clearSelectedButton);
-        View finish = findViewById(R.id.finishButton);
+        hideSetupButtons();
+        lockLocations();
+        showConnectionButtons();
 
-        ((RelativeLayout)finish.getParent()).removeView(finish);
-        ((RelativeLayout)clearAll.getParent()).removeView(clearAll);
-        ((RelativeLayout) clear.getParent()).removeView(clear);
+    }
 
-        for(int i = 0; i < locations.length; i++){
+    private final void showConnectionButtons() {
+        findViewById(R.id.streamButton).setVisibility(View.VISIBLE);
+        findViewById(R.id.connectButton).setVisibility(View.VISIBLE);
+        findViewById(R.id.stopButton).setVisibility(View.VISIBLE);
+    }
+
+    private final void lockLocations(){
+        for (int i = 0; i < locations.length; i++) {
             TextView locView = (TextView) locationsGridView.getChildAt(i);
             locView.setBackgroundResource(R.drawable.grid_background_locked);
             locView.setTextColor(Color.WHITE);
             locked = true;
         }
-
     }
 
+    private final void hideSetupButtons(){
+        findViewById(R.id.clearButton).setVisibility(View.INVISIBLE);
+        findViewById(R.id.clearSelectedButton).setVisibility(View.INVISIBLE);
+        findViewById(R.id.finishButton).setVisibility(View.INVISIBLE);
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

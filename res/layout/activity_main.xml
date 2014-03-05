@@ -26,14 +26,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/locationGridView"
-            android:layout_above="@+id/buttonGroup"
+            android:layout_above="@+id/pairButtonGroup"
             android:background="@drawable/grid_background_default"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="10dp"/>
 
 
     <RelativeLayout
-            android:id="@+id/buttonGroup"
+            android:id="@+id/pairButtonGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -45,7 +45,9 @@
                 android:layout_width="wrap_content"
                 android:layout_marginRight="5dp"
                 android:text="Finish"
-                android:onClick="finishClick"/>
+                android:onClick="finishClick"
+                android:visibility="visible"
+                />
 
         <Button
                 android:id="@+id/clearSelectedButton"
@@ -53,7 +55,9 @@
                 android:layout_width="wrap_content"
                 android:text="Clear Selected"
                 android:layout_toRightOf="@+id/finishButton"
-                android:onClick="clearSelectedClick"/>
+                android:onClick="clearSelectedClick"
+                android:visibility="visible"
+                />
 
         <Button
                 android:id="@+id/clearButton"
@@ -62,7 +66,46 @@
                 android:layout_width="wrap_content"
                 android:layout_marginLeft="5dp"
                 android:text="Clear All"
-                android:onClick="clearClick"/>
+                android:onClick="clearClick"
+                android:visibility="visible"
+                />
+    </RelativeLayout>
+
+    <RelativeLayout
+            android:id="@+id/connectButtonGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            >
+
+        <Button
+                android:id="@+id/connectButton"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_marginRight="5dp"
+                android:text="Connect"
+                android:visibility="invisible"
+                android:onClick="connectClick"/>
+
+        <Button
+                android:id="@+id/streamButton"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="Stream"
+                android:layout_toRightOf="@+id/connectButton"
+                android:visibility="invisible"
+                android:onClick="streamClick"/>
+
+        <Button
+                android:id="@+id/stopButton"
+                android:layout_toRightOf="@+id/streamButton"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:text="Stop"
+                android:visibility="invisible"
+                android:onClick="stopClick"/>
     </RelativeLayout>
 
 </RelativeLayout>
