@@ -15,7 +15,7 @@ public class BluetoothConnector extends Thread {
     private Context mContext;
     private BluetoothAdapter mBluetoothAdapter;
     private Set<BluetoothDevice> waxDevices;
-    private List<String> devices;
+    private List<DeviceToBeAdded> devices;
     private ExecutorService pool;
     private DeviceConnection[] threads;
     private static final String BLUETOOTH_UNSUPPORTED = "Bluetooth unsupported";
@@ -33,7 +33,7 @@ public class BluetoothConnector extends Thread {
      * @param devices list of device names to be streamed from
      *                TODO MAKE WORK?!?!
      */
-    public BluetoothConnector(List<String> devices, Context context) {
+    public BluetoothConnector(List<DeviceToBeAdded> devices, Context context) {
         // Initialised later
         this.mContext = context;
         this.devices = devices;

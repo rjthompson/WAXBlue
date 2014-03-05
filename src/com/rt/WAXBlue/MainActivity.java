@@ -130,6 +130,11 @@ public class MainActivity extends Activity {
 
     }
 
+    /**
+     * Group some of the bluetooth operations together, including enabling BT if disabled and
+     * populating the paired devices set and list.
+     * @param btA Default Bluetooth Adapter
+     */
     private void queryBT(BluetoothAdapter btA){
         if (!btA.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -140,13 +145,15 @@ public class MainActivity extends Activity {
         populatePairedDevices();
     }
 
+    /**
+     * Populates just the paired devices list from the set.
+     */
     private void populatePairedDevices(){
         //Populate Array Adapter with devices for display in list view
 
         if (pairedDevicesSet.size() > 0) {
             for (BluetoothDevice d : pairedDevicesSet) {
                 pairedDevicesList.add(d.getName());
-                //deviceDisplayArrayAdapter.add(d.getName());
             }
         }
     }
@@ -158,7 +165,7 @@ public class MainActivity extends Activity {
     public void startConnect(View v) {
         // Get number of devices
         // Start bluetooth connection
-        bConn = new BluetoothConnector(pairedDevicesList, getApplicationContext());
+        bConn = new BluetoothConnector(addedDevicesList, getApplicationContext());
         bConn.start();
     }
 
@@ -213,35 +220,6 @@ public class MainActivity extends Activity {
         String state = Environment.getExternalStorageState();
         return Environment.MEDIA_MOUNTED.equals(state) ||
                 Environment.MEDIA_MOUNTED_READ_ONLY.equals(state);
-    }
-
-    public class DeviceToBeAdded{
-
-        private BluetoothDevice d;
-        private String location;
-
-        public DeviceToBeAdded(BluetoothDevice d, String location){
-            this.d = d;
-            this.location = location;
-        }
-
-        public String getDeviceName(){
-            return d.getName();
-        }
-
-        public String getDeviceAddress(){
-            return d.getAddress();
-        }
-
-        public String getLocation(){
-            return this.location;
-        }
-
-        @Override
-        public String toString(){
-            return this.getDeviceName() + ", " + this.getDeviceAddress() + ", " + this.getLocation();
-        }
-
     }
 }
 
