@@ -43,18 +43,25 @@
                 android:id="@+id/finishButton"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:layout_marginRight="10dp"
+                android:layout_marginRight="5dp"
                 android:text="Finish"
                 android:onClick="finishClick"/>
 
+        <Button
+                android:id="@+id/clearSelectedButton"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="Clear Selected"
+                android:layout_toRightOf="@+id/finishButton"
+                android:onClick="clearSelectedClick"/>
 
         <Button
                 android:id="@+id/clearButton"
-                android:layout_toRightOf="@+id/finishButton"
+                android:layout_toRightOf="@+id/clearSelectedButton"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:text="Clear"
+                android:layout_marginLeft="5dp"
+                android:text="Clear All"
                 android:onClick="clearClick"/>
     </RelativeLayout>
 
