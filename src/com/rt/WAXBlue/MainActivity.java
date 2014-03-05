@@ -55,6 +55,12 @@ public class MainActivity extends Activity {
      */
     private void init(){
 
+        if(!checkBluetooth()){
+            finish();
+            //TODO make sure no other options
+
+        }
+
         ListView pairedDeviceListView = (ListView) this.findViewById(R.id.deviceListView);
 
         addedDevicesList = new ArrayList<DeviceToBeAdded>();
@@ -105,10 +111,6 @@ public class MainActivity extends Activity {
             finish();
         }
 
-        //Fetch Bluetooth Adapter and run BT queries
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        queryBT(mBluetoothAdapter);
-
         locationsGridView = (GridView) findViewById(R.id.locationGridView);
         locationsList = new ArrayList<String>();
         Collections.addAll(locationsList, locations);
@@ -125,24 +127,37 @@ public class MainActivity extends Activity {
 
             }
         });
-
-
-
     }
 
     /**
-     * Group some of the bluetooth operations together, including enabling BT if disabled and
-     * populating the paired devices set and list.
-     * @param btA Default Bluetooth Adapter
+     * Checks that bluetooth is supported, enabled and that there are devices paired.
+     * @return
      */
-    private void queryBT(BluetoothAdapter btA){
-        if (!btA.isEnabled()) {
+    private boolean checkBluetooth() {
+
+        //Retrieve adapter
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        //Check that Bluetooth is supported on Android Device
+        if (mBluetoothAdapter == null) {
+            Toast.makeText(this, "Bluetooth is not supported on this device", 0).show();
+            finish();
+        }
+
+        // Check if enabled
+        if (!mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
+
         //Retrieve set of paired devices
         pairedDevicesSet = mBluetoothAdapter.getBondedDevices();
         populatePairedDevices();
+
+        //TODO if number of paired devices is less than number of locations, open up dialogue for discovery of new items
+
+        if (D) Log.d(TAG, "Connected Successfully to Adapter");
+        return true;
     }
 
     /**

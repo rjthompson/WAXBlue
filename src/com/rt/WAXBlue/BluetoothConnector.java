@@ -10,35 +10,26 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 public class BluetoothConnector extends Thread {
     private Context mContext;
     private BluetoothAdapter mBluetoothAdapter;
     private Set<BluetoothDevice> waxDevices;
-    private List<DeviceToBeAdded> devices;
-    private ExecutorService pool;
     private DeviceConnection[] threads;
-    private static final String BLUETOOTH_UNSUPPORTED = "Bluetooth unsupported";
-    private static final String BLUETOOTH_DISABLED = "Bluetooth disabled";
-    private static final String NO_PAIRED_DEVICES = "No paired devices";
-    private static final String NO_CWA_DEVICES = "No paired CWA devices";
-    private static final int REQUEST_ENABLE_BT = 1;
     private static final String PREFIX = "";
 
     private static final String TAG = "Bluetooth Connector";
     private static final boolean D = true;
 
     /**
-     * Constructor instantiates thread pool
+     * Constructor
      * @param devices list of device names to be streamed from
-     *                TODO MAKE WORK?!?!
      */
     public BluetoothConnector(List<DeviceToBeAdded> devices, Context context) {
 
         // Initialised later
         this.mContext = context;
-
-        this.devices = devices;
 
         if(D) Log.d(TAG, "Devices: " + devices.toString());
 
@@ -75,8 +66,10 @@ public class BluetoothConnector extends Thread {
 
         // Fetch adapter
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        //Check that Bluetooth is supported on Android Device
         if (mBluetoothAdapter == null) {
-            throw new Exception(BLUETOOTH_UNSUPPORTED);
+            Toast.makeText(mContext, "Bluetooth is not supported on this device", 0).show();
+            //fail this shoudl really be done on app start up.
         }
 
         // Check if enabled
@@ -85,13 +78,10 @@ public class BluetoothConnector extends Thread {
         // Fetch all paired devices
         Set<BluetoothDevice> pairedDevices = getPairedDevices();
         if (pairedDevices == null) {
-            throw new Exception(NO_PAIRED_DEVICES);
         }
 
         // Find WAX devices
-        waxDevices = getWAXDevices(pairedDevices);
         if (waxDevices.isEmpty()) {
-            throw new Exception(NO_CWA_DEVICES);
         }
         if (D) Log.d(TAG, "Connected Successfully to Adapter");
         return true;
