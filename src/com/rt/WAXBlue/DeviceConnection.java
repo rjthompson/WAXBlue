@@ -66,8 +66,7 @@ public class DeviceConnection implements Runnable {
         // Start communication
         mConnected = new ConnectedThread(mSocket, id, mContext);
         mConnected.start();
-        //mConnected.write("device\r\n\r\n".getBytes());
-        mConnected.setRate(8);
+        mConnected.setRate(8);    //TODO make passable
         mConnected.startStream();
     }
 

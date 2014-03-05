@@ -50,7 +50,7 @@ public class BackgroundAdapter extends BaseAdapter {
 
             TextView textView = (TextView) gridView.findViewById(R.id.grid_item_label);
             textView.setText(values[position]);
-            textView.setBackgroundResource(R.drawable.gridbackground);
+            textView.setBackgroundResource(R.drawable.grid_background_default);
 
 
         }else{

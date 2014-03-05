@@ -2,9 +2,12 @@ package com.rt.WAXBlue;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -22,24 +25,29 @@ public class MainActivity extends Activity {
     private BluetoothConnector bConn;                           //Connector to set up and manage threads for BT devices
     private BluetoothAdapter mBluetoothAdapter;                 //Default Bluetooth adapter
     private Set<BluetoothDevice> pairedDevicesSet;              //Set of devices paired with phone
+    private ListView pairedDeviceListView;
     private List<String> pairedDevicesList;                     //List of device names paired with phone
     private List<DeviceToBeAdded> addedDevicesList;             //List of devices to be connected to
     private ArrayAdapter<String> deviceDisplayArrayAdapter;     //Paired devices array adapter
 
 
-    private GridView locationsGridView;                         //GridView to display the locations at which the devices will be attached
-    private String[] locations = {                              //Array of locations to which the devices can be attached
+    private GridView locationsGridView;                         //GridView to display the locations at which the devices
+                                                                //will be attached
+    private String[] locations = {                              //Array of locations to which the devices can be
+                                                                //attached
             "Helmet", "Saddle", "Front Left", "Back Left",
             "Front Right", "Back Right"
     };
     private ArrayList<String> locationsList;                    //ArrayList of locations to be passed to array adapter
     private ArrayAdapter<String> locationDisplayArrayAdapter;   //Array Adapter for GridView
 
-    private int selected = -1;                                  //Int representing which location has been selected
+    private int selectedItem = -1;                              //Int representing which location has been selected
+    private boolean locked = false;                             //Flag to indicate status of buttons
+    private boolean selected = false;                           //Flag to indicate if any location is currently selected
     private static final int REQUEST_ENABLE_BT = 1;             //Int to allow for BT enabling request
-
     private static final String TAG = "Main Activity";          //Debugging tag
     private static final boolean D = true;                      //Flag to turn on or off debug logging
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +65,7 @@ public class MainActivity extends Activity {
 
 
 
-        ListView pairedDeviceListView = (ListView) this.findViewById(R.id.deviceListView);
+        pairedDeviceListView = (ListView) this.findViewById(R.id.deviceListView);
 
         addedDevicesList = new ArrayList<DeviceToBeAdded>();
 
@@ -69,24 +77,25 @@ public class MainActivity extends Activity {
 
         }
 
-        deviceDisplayArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, pairedDevicesList);
+        deviceDisplayArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
+                pairedDevicesList);
 
         pairedDeviceListView.setAdapter(deviceDisplayArrayAdapter);
         pairedDeviceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 //Check that a location is currently selected
-                if (selected != -1) {
+                if (selectedItem != -1 && !locked) {
 
                     //Initialise the TextView to control the text on the button
-                    TextView locView = (TextView) locationsGridView.getChildAt(selected);
+                    TextView locView = (TextView) locationsGridView.getChildAt(selectedItem);
 
                     //Un-highlight the button
-                    locView.setBackgroundResource(R.drawable.gridbackground);
+                    locView.setBackgroundResource(R.drawable.grid_background_default);
 
                     //Update the button to show the device associated with that location
-                    String s = locationsList.get(selected);
-                    locationsList.set(selected, s + "\n" + pairedDevicesList.get(i));
+                    String s = locationsList.get(selectedItem);
+                    locationsList.set(selectedItem, s + "\n" + pairedDevicesList.get(i));
                     locationDisplayArrayAdapter.notifyDataSetChanged();
 
                     //Associate the selected device with the location by creating a new
@@ -94,16 +103,20 @@ public class MainActivity extends Activity {
                     boolean found = false;
                     for (BluetoothDevice d : pairedDevicesSet) {
                         if (d.getName().equals(pairedDevicesList.get(i)) && !found) {
-                            if (D) Log.d(TAG, "Adding Device: " + d.getName() + " to added devices list");
-                            addedDevicesList.add(new DeviceToBeAdded(d, locations[selected]));
+                            addedDevicesList.add(new DeviceToBeAdded(d, locations[selectedItem]));
                             found = true;
                         }
                     }
+                    if(D)Log.d(TAG, "Location: " + locations[selectedItem] + "\ni: " + i+"\nDevice: "+pairedDevicesList
+                            .get(i));
+
                     //Remove the added device from the list of devices being displayed, device still exists
                     //in pairedDevicesSet
                     pairedDevicesList.remove(i);
+                    deviceDisplayArrayAdapter.notifyDataSetChanged();
 
-                    selected = -1;
+                    selectedItem = -1;
+                    selected = false;
                 }
             }
         });
@@ -122,11 +135,23 @@ public class MainActivity extends Activity {
         locationsGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if(selected != i){
-                    view.setBackgroundResource(R.drawable.gridbackgroundhigh);
-                    selected = i;
+                if(!locked){
+                    if(!selected){
+                        view.setBackgroundResource(R.drawable.grid_background_highlighted);
+                        selectedItem = i;
+                        selected = true;
+                    }else if(selectedItem == i){
+                        view.setBackgroundResource(R.drawable.grid_background_default);
+                        selectedItem = -1;
+                        selected = false;
+                    }else{
+                        view.setBackgroundResource(R.drawable.grid_background_highlighted);
+                        locationsGridView.getChildAt(selectedItem)
+                                .setBackgroundResource(R.drawable.grid_background_default);
+                        selectedItem = i;
+                        selected = true;
+                    }
                 }
-
             }
         });
     }
@@ -208,6 +233,30 @@ public class MainActivity extends Activity {
     }
 
     public void finishClick(View v){
+
+        new AlertDialog.Builder(this)
+                .setTitle("Finish")
+                .setMessage("Are you sure you want to accept this pairing?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which){
+                        prepForConnection();
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show();
+    }
+
+    private void prepForConnection() {
+        //Remove the paired devices list
+        ((RelativeLayout) pairedDeviceListView.getParent()).removeView(pairedDeviceListView);
+
+        for(int i = 0; i < locations.length; i++){
+            TextView locView = (TextView) locationsGridView.getChildAt(i);
+            locView.setBackgroundResource(R.drawable.grid_background_locked);
+            locView.setTextColor(Color.WHITE);
+            locked = true;
+        }
 
     }
 

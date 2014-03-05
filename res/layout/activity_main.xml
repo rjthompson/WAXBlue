@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/locationGridView"
             android:layout_above="@+id/buttonGroup"
-            android:background="@drawable/gridbackground"
+            android:background="@drawable/grid_background_default"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="10dp"/>
 

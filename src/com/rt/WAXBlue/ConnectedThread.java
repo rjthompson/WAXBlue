@@ -11,7 +11,6 @@ public class ConnectedThread extends Thread {
 
     private InputStream inStream;
     private OutputStream outStream;
-    private OutputStream fileOutStream;
     private File file;
     private BufferedWriter buf;
 
@@ -20,6 +19,8 @@ public class ConnectedThread extends Thread {
     private static final boolean D = true;
     private boolean free = false;
 
+
+    //TODO Write methods efficientise.
 
     /**
      * Constructor for performing socket read/write
