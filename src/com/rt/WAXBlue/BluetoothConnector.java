@@ -34,45 +34,32 @@ public class BluetoothConnector extends Thread {
      *                TODO MAKE WORK?!?!
      */
     public BluetoothConnector(List<DeviceToBeAdded> devices, Context context) {
+
         // Initialised later
         this.mContext = context;
+
         this.devices = devices;
+
         if(D) Log.d(TAG, "Devices: " + devices.toString());
-        // Pool improves efficiency when managing and tracking multiple threads
-        //pool = Executors.newFixedThreadPool(devices.size());
 
         threads = new DeviceConnection[devices.size()];
 
         try {
             if (connectionSuccessful()) {
+
+                //Counter for Connection IDs
                 int counter = 0;
-                Iterator<BluetoothDevice> itr = waxDevices.iterator();
-                for(int i = 0; i < waxDevices.size(); i++){
-                    BluetoothDevice d;
-                    if(itr.hasNext()){
-                        d = itr.next();
-                    }else{
-                        continue;
-                    }
-                    if(!(devices.contains(d.getName()))){
-                        if(D) Log.d(TAG, d.getName()+" paired but not required");
-                        continue;
-                    }
-                    if (D) Log.d(TAG, "Attempting to create new Device Connection with " + d.getName());
 
-                    // pool.execute(new DeviceConnection(d, counter));
+                for(DeviceToBeAdded d : devices){
 
-                    threads[counter] = new DeviceConnection(d, counter, mContext);
-                    if(D) Log.d(TAG, "Created new Device Connection with " + d.getName());
-                    //threads[i].run();
+                    BluetoothDevice device = d.getDevice();
+
+                    if (D) Log.d(TAG, "Attempting to create new Device Connection with " + device.getName());
+                    threads[counter] = new DeviceConnection(device, counter, mContext);
+
                     counter++;
-                }
 
-//                for (String s : devices) {
-//                    Log.d(TAG, waxDevices.toString());
-//					pool.execute(new DeviceConnection(s, waxDevices, counter));
-//					counter++;
-//				}
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

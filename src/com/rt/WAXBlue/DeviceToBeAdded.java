@@ -16,6 +16,10 @@ public class DeviceToBeAdded {
         this.location = location;
     }
 
+    public BluetoothDevice getDevice(){
+        return this.d;
+    }
+
     public String getDeviceName() {
         return d.getName();
     }
