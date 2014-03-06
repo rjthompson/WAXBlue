@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.util.Log;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -18,7 +19,7 @@ public class DeviceConnection implements Runnable {
     private BluetoothDevice waxDevice;
     private BluetoothSocket mSocket;
     private ConnectedThread mConnected;
-    private Context mContext;
+    private File storageDirectory;
     private final int id;
     private static final String TAG = "Device Connection";
     private static final boolean D = true;
@@ -26,9 +27,9 @@ public class DeviceConnection implements Runnable {
 
     private static final String UUID_STRING = "00001101-0000-1000-8000-00805f9b34fb";
 
-    public DeviceConnection(BluetoothDevice waxDevice, final int id, Context context) {
+    public DeviceConnection(BluetoothDevice waxDevice, final int id, File storageDirectory) {
         if (D) Log.d(TAG, "\nConstructing DeviceConnection\nDevice: " + waxDevice.getName() + "\nID: "+id);
-        this.mContext = context;
+        this.storageDirectory = storageDirectory;
         this.waxDevice = waxDevice;
         this.id = id;
         mSocket = null;
@@ -64,7 +65,7 @@ public class DeviceConnection implements Runnable {
         }
 
         // Start communication
-        mConnected = new ConnectedThread(mSocket, id, mContext);
+        mConnected = new ConnectedThread(mSocket, id, storageDirectory);
         mConnected.start();
         mConnected.setRate(8);    //TODO make passable
         mConnected.startStream();

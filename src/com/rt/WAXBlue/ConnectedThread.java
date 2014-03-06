@@ -1,8 +1,6 @@
 package com.rt.WAXBlue;
 
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
-import android.os.Environment;
 import android.util.Log;
 
 import java.io.*;
@@ -17,7 +15,6 @@ public class ConnectedThread extends Thread {
     private int id;
     private static final String TAG = "Connected Thread";
     private static final boolean D = true;
-    private boolean free = false;
 
 
     //TODO Write methods efficientise.
@@ -26,13 +23,14 @@ public class ConnectedThread extends Thread {
      * Constructor for performing socket read/write
      * @param socket Bluetooth socket
      */
-    public ConnectedThread(BluetoothSocket socket, int id, Context context) {
+    public ConnectedThread(BluetoothSocket socket, int id, File storageDirectory) {
+
         if(D) Log.d(TAG, "Creating ConnectedThread");
         try {
             inStream = socket.getInputStream();
             outStream = socket.getOutputStream();
             this.id = id;
-            this.file = createAndGetDirectoryForStorage();
+            this.file = new File(storageDirectory + "/logID" + id + ".csv");
             buf = new BufferedWriter(new FileWriter(file, true));
 
         } catch (IOException e) {
@@ -84,19 +82,13 @@ public class ConnectedThread extends Thread {
         int bytes;
         while (true) {
             try {
+
                 bytes = inStream.read(buffer);
                 String data = new String(buffer, 0, bytes);
 
-                //OUTPUT -- TODO LOG
-
-                //Log.d(TAG, "ID: " + id + " Data: " + data);
-
-
                 buf.append(data);
 
-
-                // Check data against regex
-
+                //TODO Check data against regex
 
             } catch (IOException e) {
                 break;
@@ -104,19 +96,4 @@ public class ConnectedThread extends Thread {
 
         }
     }
-
-    private File createAndGetDirectoryForStorage(){
-        if(D) Log.d(TAG, "Writing file to "+ Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString());
-        File file = new File("sdcard/logID"+id+".csv");
-        if(!file.exists()){
-            try{
-                file.createNewFile();
-            }catch(IOException e){
-                Log.e(TAG, "Unable to create File: "+e.getMessage());
-            }
-        }
-
-        return file;
-    }
-
 }

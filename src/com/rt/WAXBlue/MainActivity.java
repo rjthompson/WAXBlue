@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.*;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,7 +32,7 @@ public class MainActivity extends Activity {
     private List<String> pairedDevicesList;                     //List of device names paired with phone
     private List<DeviceToBeAdded> addedDevicesList;             //List of devices to be connected to
     private ArrayAdapter<String> deviceDisplayArrayAdapter;     //Paired devices array adapter
-
+    private File storageDirectory;
 
     private GridView locationsGridView;                         //GridView to display the locations at which the devices
     //will be attached
@@ -57,7 +58,6 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
-
     }
 
     /**
@@ -83,6 +83,7 @@ public class MainActivity extends Activity {
                 pairedDevicesList);
 
         pairedDeviceListView.setAdapter(deviceDisplayArrayAdapter);
+        pairedDeviceListView.getBackground().setAlpha(92);
         pairedDeviceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -126,6 +127,12 @@ public class MainActivity extends Activity {
         if(!isExternalStorageWritable()){
             displayToast("Cannot Write to External Storage :(");
             finish();
+        }else{
+            if (createDirectoryForStorage()) {
+                displayToast("Created Directory");
+            }else{
+                displayToast("Directory Not Created");
+            }
         }
 
         locationsGridView = (GridView) findViewById(R.id.locationGridView);
@@ -150,7 +157,18 @@ public class MainActivity extends Activity {
                 }
             }
         });
+
+
+
     }
+
+    private boolean createDirectoryForStorage() {
+
+        storageDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString()+"/Data/");
+        return storageDirectory.exists() || storageDirectory.mkdirs();
+    }
+
+
     private void deselectItem(View view){
         view.setBackgroundResource(R.drawable.grid_background_default);
         selected = false;
@@ -204,26 +222,6 @@ public class MainActivity extends Activity {
                 pairedDevicesList.add(d.getName());
             }
         }
-    }
-
-    /**
-     * Initiate Bluetooth connection
-     * @param v View
-     */
-    public void startConnect(View v) {
-        // Get number of devices
-        // Start bluetooth connection
-        bConn = new BluetoothConnector(addedDevicesList, getApplicationContext());
-        bConn.start();
-    }
-
-    public void startStream(View v){
-        if(D) Log.d(TAG, "Starting Stream");
-        bConn.runThreads();
-    }
-
-    public void stopStream(View v){
-        bConn.stopThreads();
     }
 
     public void clearClick(View v){
@@ -280,6 +278,29 @@ public class MainActivity extends Activity {
                 .show();
     }
 
+    /**
+     * Initiate Bluetooth connection
+     *
+     * @param v View
+     */
+    public void connectClick(View v) {
+        // Get number of devices
+        // Start bluetooth connection
+        bConn = new BluetoothConnector(addedDevicesList, storageDirectory);
+        bConn.start();
+    }
+
+
+    public void streamClick(View v) {
+        if (D) Log.d(TAG, "Starting Stream");
+        bConn.runThreads();
+    }
+
+    public void stopClick(View v) {
+        //TODO fix crash
+        bConn.stopThreads();
+    }
+
     private void prepForConnection() {
         //Remove the paired devices list
         ((RelativeLayout) pairedDeviceListView.getParent()).removeView(pairedDeviceListView);
@@ -290,13 +311,13 @@ public class MainActivity extends Activity {
 
     }
 
-    private final void showConnectionButtons() {
+    private void showConnectionButtons() {
         findViewById(R.id.streamButton).setVisibility(View.VISIBLE);
         findViewById(R.id.connectButton).setVisibility(View.VISIBLE);
         findViewById(R.id.stopButton).setVisibility(View.VISIBLE);
     }
 
-    private final void lockLocations(){
+    private void lockLocations(){
         for (int i = 0; i < locations.length; i++) {
             TextView locView = (TextView) locationsGridView.getChildAt(i);
             locView.setBackgroundResource(R.drawable.grid_background_locked);
@@ -305,7 +326,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    private final void hideSetupButtons(){
+    private void hideSetupButtons(){
         findViewById(R.id.clearButton).setVisibility(View.INVISIBLE);
         findViewById(R.id.clearSelectedButton).setVisibility(View.INVISIBLE);
         findViewById(R.id.finishButton).setVisibility(View.INVISIBLE);
@@ -337,6 +358,12 @@ public class MainActivity extends Activity {
         return Environment.MEDIA_MOUNTED.equals(state) ||
                 Environment.MEDIA_MOUNTED_READ_ONLY.equals(state);
     }
+
+    public File getStorageDirectory() {
+        return storageDirectory;
+    }
+
+
 }
 
 
