@@ -23,15 +23,16 @@ public class DeviceConnection implements Runnable {
     private final int id;
     private static final String TAG = "Device Connection";
     private static final boolean D = true;
-
+    private static String location;
 
     private static final String UUID_STRING = "00001101-0000-1000-8000-00805f9b34fb";
 
-    public DeviceConnection(BluetoothDevice waxDevice, final int id, File storageDirectory) {
+    public DeviceConnection(BluetoothDevice waxDevice, final int id, File storageDirectory, String location) {
         if (D) Log.d(TAG, "\nConstructing DeviceConnection\nDevice: " + waxDevice.getName() + "\nID: "+id);
         this.storageDirectory = storageDirectory;
         this.waxDevice = waxDevice;
         this.id = id;
+        this.location = location;
         mSocket = null;
 
     }
@@ -65,7 +66,7 @@ public class DeviceConnection implements Runnable {
         }
 
         // Start communication
-        mConnected = new ConnectedThread(mSocket, id, storageDirectory);
+        mConnected = new ConnectedThread(mSocket, id, storageDirectory, location);
         mConnected.start();
         mConnected.setRate(8);    //TODO make passable
         mConnected.startStream();

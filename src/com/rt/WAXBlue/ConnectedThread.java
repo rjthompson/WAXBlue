@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
 import java.io.*;
+import java.util.Calendar;
 
 public class ConnectedThread extends Thread {
 
@@ -11,6 +12,7 @@ public class ConnectedThread extends Thread {
     private OutputStream outStream;
     private File file;
     private BufferedWriter buf;
+    private BluetoothSocket socket;
 
     private int id;
     private static final String TAG = "Connected Thread";
@@ -23,14 +25,15 @@ public class ConnectedThread extends Thread {
      * Constructor for performing socket read/write
      * @param socket Bluetooth socket
      */
-    public ConnectedThread(BluetoothSocket socket, int id, File storageDirectory) {
-
+    public ConnectedThread(BluetoothSocket socket, int id, File storageDirectory, String location) {
+        this.socket = socket;
         if(D) Log.d(TAG, "Creating ConnectedThread");
         try {
             inStream = socket.getInputStream();
             outStream = socket.getOutputStream();
             this.id = id;
-            this.file = new File(storageDirectory + "/logID" + id + ".csv");
+            Calendar c = Calendar.getInstance();
+            this.file = new File(storageDirectory + "/"+id+"log_" + location + "_"+ c.get(Calendar.DATE)+"_"+c.get(Calendar.DAY_OF_YEAR)+".csv");
             buf = new BufferedWriter(new FileWriter(file, true));
 
         } catch (IOException e) {
@@ -73,6 +76,11 @@ public class ConnectedThread extends Thread {
             outStream.write("\r\n".getBytes());
         } catch (IOException e) {
             Log.e(TAG, "Error writing to device: " + e.getMessage());
+        }
+        try {
+            socket.close();
+        } catch (IOException e) {
+            Log.e(TAG, "Failed to close Socket: "+e.getMessage());
         }
     }
 

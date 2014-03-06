@@ -35,7 +35,7 @@ public class BluetoothConnector extends Thread {
                 BluetoothDevice device = d.getDevice();
 
                 if (D) Log.d(TAG, "Attempting to create new Device Connection with " + device.getName());
-                threads[counter] = new DeviceConnection(device, counter, storageDirectory);
+                threads[counter] = new DeviceConnection(device, counter, storageDirectory, d.getLocation());
                 if (D) Log.d(TAG, "New Device Connections Created Successfully");
                 counter++;
 
