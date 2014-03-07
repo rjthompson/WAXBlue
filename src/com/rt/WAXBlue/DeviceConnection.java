@@ -14,31 +14,34 @@ import java.util.UUID;
  * @author Rob Thompson
  *
  */
-public class DeviceConnection implements Runnable {
+public class DeviceConnection{
 
     private BluetoothDevice waxDevice;
     private BluetoothSocket mSocket;
-    private ConnectedThread mConnected;
+    private Thread mConnected;
     private File storageDirectory;
+    private ConnectedThread connection;
     private final int id;
+    private final int rate;
     private static final String TAG = "Device Connection";
     private static final boolean D = true;
     private static String location;
 
     private static final String UUID_STRING = "00001101-0000-1000-8000-00805f9b34fb";
 
-    public DeviceConnection(BluetoothDevice waxDevice, final int id, File storageDirectory, String location) {
+    public DeviceConnection(BluetoothDevice waxDevice, final int id, File storageDirectory, String location, int rate) {
         if (D) Log.d(TAG, "\nConstructing DeviceConnection\nDevice: " + waxDevice.getName() + "\nID: "+id);
         this.storageDirectory = storageDirectory;
         this.waxDevice = waxDevice;
         this.id = id;
         this.location = location;
+        this.rate = rate;
         mSocket = null;
 
     }
 
-    @Override
-    public void run() {
+
+    public void init() {
         if (D) Log.d(TAG, "Running Device Connection");
 
         if(D) Log.d(TAG, "Device: " + waxDevice.getName());
@@ -66,14 +69,22 @@ public class DeviceConnection implements Runnable {
         }
 
         // Start communication
-        mConnected = new ConnectedThread(mSocket, id, storageDirectory, location);
+        connection = new ConnectedThread(mSocket, id, storageDirectory, location, rate);
+        mConnected = new Thread(connection);
         mConnected.start();
-        mConnected.setRate(8);    //TODO make passable
-        mConnected.startStream();
+
+
     }
 
+
     public void stopStream(){
-        mConnected.stopStream();
+        connection.stopStream();
+        try {
+            mConnected.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
     }
 
 }
