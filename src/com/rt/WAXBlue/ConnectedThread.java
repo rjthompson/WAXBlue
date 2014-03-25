@@ -82,6 +82,19 @@ public class ConnectedThread implements Runnable {
         }
     }
 
+    public void setDataMode(boolean longMode){
+        int mode = -1;
+        if(longMode){
+            mode = 128;
+        }else{
+            mode = 0;
+        }
+        try {
+            outStream.write(("datamode " + mode + "\r\n\r\n").getBytes());
+        } catch (IOException e) {
+            Log.e(TAG, "Error writing to device: " + e.getMessage());
+        }
+    }
     public void startStream() {
         try {
             outStream.write("STREAM=1\r\n".getBytes());
@@ -115,71 +128,79 @@ public class ConnectedThread implements Runnable {
     public synchronized void run() {
 
         try{
-        writerThread1.start();
-        writerThread2.start();
-        int bytes;
-        boolean useBuffer1 = true;
-        try {
-            Thread.sleep(200);
-        } catch (InterruptedException e) {
-            Log.e(TAG, "Sleep Interrupted");
-        }
-        setRate(rate);
-        try {
-            Thread.sleep(200);
-        } catch (InterruptedException e) {
-            Log.e(TAG, "Sleep Interrupted");
-        }
-        startStream();
-        //TODO semaphore for all threads to go.
-        try {
-            Thread.sleep(200);
-        } catch (InterruptedException e) {
-            Log.e(TAG, "Sleep Interrupted");
-        }
-
-        while (running) {
-
+            writerThread1.start();
+            writerThread2.start();
+            int bytes;
+            boolean useBuffer1 = true;
             try {
-                byte[] buffer = new byte[2048];
-                bytes = inStream.read(buffer);
-
-                if(useBuffer1){
-
-                    bigBuffer1.add(new BufferWithSize(buffer, bytes));
-
-                    if(bigBuffer1.size() > 1000){
-                        writerThread1.go();
-                        useBuffer1 = false;
-                    }
-
-
-
-                }else{
-
-                    bigBuffer2.add(new BufferWithSize(buffer, bytes));
-
-                    if (bigBuffer2.size() > 1000) {
-                        writerThread2.go();
-                        useBuffer1 = true;
-                    }
-                }
-
-
-                //parseOutStream.write(buffer, 0, bytes);
-                //String data = new String(buffer, 0, bytes);
-
-
-
-                //bufferedWriter.append(data);
-
-                //TODO Check data against regex
-
-            } catch (IOException e) {
-                break;
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                Log.e(TAG, "Sleep Interrupted");
+            }
+            setRate(rate);
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                Log.e(TAG, "Sleep Interrupted");
             }
 
-        }
+
+            setDataMode(true);
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                Log.e(TAG, "Sleep Interrupted");
+            }
+            startStream();
+            //TODO semaphore for all threads to go.
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                Log.e(TAG, "Sleep Interrupted");
+            }
+
+            while (running) {
+
+                try {
+                    byte[] buffer = new byte[1024];
+                    bytes = inStream.read(buffer);
+
+                    if(useBuffer1){
+
+                        bigBuffer1.add(new BufferWithSize(buffer, bytes));
+
+                        if(bigBuffer1.size() > 1000){
+                            writerThread1.go();
+                            useBuffer1 = false;
+                        }
+
+
+
+                    }else{
+
+                        bigBuffer2.add(new BufferWithSize(buffer, bytes));
+
+                        if (bigBuffer2.size() > 1000) {
+                            writerThread2.go();
+                            useBuffer1 = true;
+                        }
+                    }
+
+
+                    //parseOutStream.write(buffer, 0, bytes);
+                    //String data = new String(buffer, 0, bytes);
+
+
+
+                    //bufferedWriter.append(data);
+
+                    //TODO Check data against regex
+
+                } catch (IOException e) {
+                    break;
+                }
+
+            }
         }finally{
 
             try {
