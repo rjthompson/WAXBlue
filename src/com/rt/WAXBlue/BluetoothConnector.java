@@ -1,6 +1,7 @@
 package com.rt.WAXBlue;
 
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.util.Log;
 
 import java.io.File;
@@ -11,12 +12,13 @@ public class BluetoothConnector extends Thread {
 
     private static final String TAG = "Bluetooth Connector";
     private static final boolean D = true;
+    public static int connectionCount = 0;
 
     /**
      * Constructor
      * @param devices list of device names to be streamed from
      */
-    public BluetoothConnector(List<DeviceToBeAdded> devices, File storageDirectory) {
+    public BluetoothConnector(List<DeviceToBeAdded> devices, File storageDirectory, Context mContext) {
 
         // Initialised later
         if(D) Log.d(TAG, "Devices: " + devices.toString());
@@ -33,8 +35,8 @@ public class BluetoothConnector extends Thread {
 
                 BluetoothDevice device = d.getDevice();
 
-                if (D) Log.d(TAG, "Attempting to create new Device Connection with " + device.getName());
-                connections[counter] = new DeviceConnection(device, counter, storageDirectory, d.getLocation(), 100);
+                if (D) Log.d(TAG, "Attempting to create new Device Connection with " + device.getName() + " on " + d.getLocation());
+                connections[counter] = new DeviceConnection(device, counter, storageDirectory, d.getLocation(), 50);
                 if (D) Log.d(TAG, "New Device Connections Created Successfully");
                 counter++;
 

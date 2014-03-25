@@ -24,7 +24,7 @@ import java.util.Set;
 
 public class MainActivity extends Activity {
 
-    private Context mContext;
+    public Context mContext;
     private BluetoothConnector bConn;                           //Connector to set up and manage threads for BT devices
     private BluetoothAdapter mBluetoothAdapter;                 //Default Bluetooth adapter
     private Set<BluetoothDevice> pairedDevicesSet;              //Set of devices paired with phone
@@ -33,6 +33,7 @@ public class MainActivity extends Activity {
     private List<DeviceToBeAdded> addedDevicesList;             //List of devices to be connected to
     private ArrayAdapter<String> deviceDisplayArrayAdapter;     //Paired devices array adapter
     private File storageDirectory;
+    private int connectionCount = 0;
 
     private GridView locationsGridView;                         //GridView to display the locations at which the devices
     //will be attached
@@ -129,9 +130,9 @@ public class MainActivity extends Activity {
             finish();
         }else{
             if (createDirectoryForStorage()) {
-                displayToast("Created Directory");
             }else{
-                displayToast("Directory Not Created");
+                displayToast("Cannot Log Data");
+                finish();
             }
         }
 
@@ -286,7 +287,7 @@ public class MainActivity extends Activity {
     public void connectClick(View v) {
         // Get number of devices
         // Start bluetooth connection
-        bConn = new BluetoothConnector(addedDevicesList, storageDirectory);
+        bConn = new BluetoothConnector(addedDevicesList, storageDirectory, this);
         bConn.start();
     }
 
@@ -351,18 +352,6 @@ public class MainActivity extends Activity {
         String state = Environment.getExternalStorageState();
         return Environment.MEDIA_MOUNTED.equals(state);
     }
-
-    /* Checks if external storage is available to at least read */
-    public boolean isExternalStorageReadable() {
-        String state = Environment.getExternalStorageState();
-        return Environment.MEDIA_MOUNTED.equals(state) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state);
-    }
-
-    public File getStorageDirectory() {
-        return storageDirectory;
-    }
-
 
 }
 

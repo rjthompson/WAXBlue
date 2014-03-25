@@ -1,5 +1,6 @@
 package com.rt.WAXBlue;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
@@ -21,11 +22,12 @@ public class DeviceConnection{
     private Thread mConnected;
     private File storageDirectory;
     private ConnectedThread connection;
+    private Context mContext;
     private final int id;
     private final int rate;
     private static final String TAG = "Device Connection";
     private static final boolean D = true;
-    private static String location;
+    private String location;
 
     private static final String UUID_STRING = "00001101-0000-1000-8000-00805f9b34fb";
 
@@ -35,6 +37,7 @@ public class DeviceConnection{
         this.waxDevice = waxDevice;
         this.id = id;
         this.location = location;
+        Log.d(TAG, "Device Connection for " + waxDevice.getName() + " on " + location + " created.");
         this.rate = rate;
         mSocket = null;
 
@@ -59,7 +62,7 @@ public class DeviceConnection{
         try {
             mSocket.connect();
         } catch (IOException e) {
-            Log.e(TAG, "Error Connecting to Socket: "+ e.getMessage());
+            Log.e(TAG, "Error Connecting to Socket on "+waxDevice.getName() +": "+ e.getMessage());
             try {
                 mSocket.close();
             } catch (IOException e2) {
@@ -69,6 +72,7 @@ public class DeviceConnection{
         }
 
         // Start communication
+        Log.d(TAG, "Creating Thread for " + location);
         connection = new ConnectedThread(mSocket, id, storageDirectory, location, rate);
         mConnected = new Thread(connection);
         mConnected.start();
