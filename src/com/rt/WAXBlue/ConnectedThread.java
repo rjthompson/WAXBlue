@@ -36,7 +36,7 @@ public class ConnectedThread implements Runnable {
         this.rate = rate;
 
         Calendar c = Calendar.getInstance();
-        location = location.replaceAll("", "\\s");
+        location = location.replaceAll("\\s+", "");
         File file = new File(storageDirectory + "/log_" + location + "_" + c.get(Calendar.DATE) + "_" + c.get(Calendar.MONTH) +
                 "_" + c.get(Calendar.YEAR) + "_" + c.get(Calendar.HOUR_OF_DAY) + "_" + c.get(Calendar.MINUTE) + ".csv");
 
@@ -139,6 +139,13 @@ public class ConnectedThread implements Runnable {
                     byte[] buffer = new byte[1024];
                     bytes = inStream.read(buffer);
 
+                    synchronized (bigBuffer1)
+                    {
+                        bigBuffer1.add(new BufferWithSize(buffer, bytes));
+                    }
+                    writerThread1.notify();
+
+                    /*
                     if(useBuffer1){
 
                         bigBuffer1.add(new BufferWithSize(buffer, bytes));
@@ -159,7 +166,7 @@ public class ConnectedThread implements Runnable {
                             useBuffer1 = true;
                         }
                     }
-
+                    */
 
                     //parseOutStream.write(buffer, 0, bytes);
                     //String data = new String(buffer, 0, bytes);

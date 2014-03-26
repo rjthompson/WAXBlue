@@ -77,13 +77,15 @@ public class DeviceConnection{
 
 
     public void stopStream(){
-        connection.stopStream();
-        try {
-            mConnected.join();
-        } catch (InterruptedException e) {
-            Log.e(TAG, "Interrupted whilst waiting for mConnected to terminate.");
+        if(connection!=null)
+            connection.stopStream();
+        if(mConnected!=null) if (mConnected.isAlive()) {
+            try {
+                mConnected.join();
+            } catch (InterruptedException e) {
+                Log.e(TAG, "Interrupted whilst waiting for mConnected to terminate.");
+            }
         }
-
     }
 
 }

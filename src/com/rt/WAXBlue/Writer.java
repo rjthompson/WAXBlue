@@ -48,7 +48,7 @@ public class Writer extends Thread{
     @Override
     public void run() {
 
-        while(true){
+        while(isRunning){
             doWrite();
         }
 
@@ -58,6 +58,7 @@ public class Writer extends Thread{
 
     public void shutdown(){
         try {
+            this.notify();
             bufferedWriter.close();
         } catch (IOException e) {
             Log.e(TAG, "Failed to close buffered writer");
@@ -66,24 +67,32 @@ public class Writer extends Thread{
 
     private synchronized void doWrite(){
 
-        if (!isRunning) {
-            try {wait();} catch (InterruptedException e) {}
+        // Wait until we have data
+        try {wait();} catch (InterruptedException e) {}
 
-            toWrite = "";
+        // Write all the data we have
+        for(;;) {
+            ConnectedThread.BufferWithSize bws = null;
 
-            for (ConnectedThread.BufferWithSize b : bigBuffer) {
-                String data = new String(b.getBuffer(), 0, b.getSize());
-                toWrite = toWrite + data;
+            // Safely get the next thing to write
+            synchronized (bigBuffer) {
+                if (bigBuffer.size() > 0) {
+                    bws = bigBuffer.pop();
+                }
             }
-            //Log.d(TAG, "Data: " + toWrite);
+
+            // Break out when we have no more data
+            if (bws == null) { break; }
+            String data = new String(bws.getBuffer(), 0, bws.getSize());
+
             try {
                 //if (D) Log.d(TAG, "Writing");
-                bufferedWriter.append(toWrite);
+                bufferedWriter.append(data);
             } catch (IOException e2) {
                 Log.e(TAG, "Failed Writing to file");
             }
-            bigBuffer.clear();
-            pause();
+
+            //pause();
         }
     }
 
