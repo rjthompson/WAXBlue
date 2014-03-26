@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 
@@ -19,7 +18,6 @@ public class ConnectedThread implements Runnable {
     private LinkedList<BufferWithSize> bigBuffer1 = new LinkedList<BufferWithSize>();
     private LinkedList<BufferWithSize> bigBuffer2 = new LinkedList<BufferWithSize>();
 
-    private int id;
     private int rate;
     private static final String TAG = "Connected Thread";
     private static final boolean D = false;
@@ -31,16 +29,14 @@ public class ConnectedThread implements Runnable {
      * Constructor for performing socket read/write
      * @param socket Bluetooth socket
      */
-    public ConnectedThread(BluetoothSocket socket, int id, File storageDirectory, String location, int rate) {
+    public ConnectedThread(BluetoothSocket socket, File storageDirectory, String location, int rate) {
 
         this.socket = socket; //Bluetooth socket
-
-        this.id = id; //ID of sensor-location pair
 
         this.rate = rate;
 
         Calendar c = Calendar.getInstance();
-
+        location = location.replaceAll("", "\\s");
         File file = new File(storageDirectory + "/log_" + location + "_" + c.get(Calendar.DATE) + "_" + c.get(Calendar.MONTH) +
                 "_" + c.get(Calendar.YEAR) + "_" + c.get(Calendar.HOUR_OF_DAY) + "_" + c.get(Calendar.MINUTE) + ".csv");
 
@@ -63,17 +59,6 @@ public class ConnectedThread implements Runnable {
 
     }
 
-    /**
-     * Write bytes to socket output stream
-     * @param bytes Bytes to write
-     */
-    public void write(byte[] bytes) {
-        try {
-            outStream.write(bytes);
-            if(D) Log.d(TAG, "Writing: " + new String(bytes));
-        } catch (IOException e) { }
-    }
-
     public void setRate(int rate) {
         try {
             outStream.write(("rate x " + rate + "\r\n\r\n").getBytes());
@@ -83,7 +68,7 @@ public class ConnectedThread implements Runnable {
     }
 
     public void setDataMode(boolean longMode){
-        int mode = -1;
+        int mode;
         if(longMode){
             mode = 128;
         }else{
@@ -132,29 +117,18 @@ public class ConnectedThread implements Runnable {
             writerThread2.start();
             int bytes;
             boolean useBuffer1 = true;
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                Log.e(TAG, "Sleep Interrupted");
-            }
-            setRate(rate);
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                Log.e(TAG, "Sleep Interrupted");
-            }
 
+            try {
 
-            setDataMode(true);
-            try {
                 Thread.sleep(200);
-            } catch (InterruptedException e) {
-                Log.e(TAG, "Sleep Interrupted");
-            }
-            startStream();
-            //TODO semaphore for all threads to go.
-            try {
+                setRate(rate);
                 Thread.sleep(200);
+                setDataMode(true);
+                Thread.sleep(200);
+                startStream();
+
+                //TODO semaphore for all threads to go.
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 Log.e(TAG, "Sleep Interrupted");
             }
@@ -208,7 +182,7 @@ public class ConnectedThread implements Runnable {
                 outStream.close();
                 inStream.close();
             } catch (IOException e) {
-
+                Log.e(TAG, "Error closing streams");
             }
 
         }
