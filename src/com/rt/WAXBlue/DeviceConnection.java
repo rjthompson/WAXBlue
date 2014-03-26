@@ -1,9 +1,7 @@
 package com.rt.WAXBlue;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
 import android.util.Log;
 
 import java.io.File;
@@ -22,8 +20,6 @@ public class DeviceConnection{
     private Thread mConnected;
     private File storageDirectory;
     private ConnectedThread connection;
-    private Context mContext;
-    private final int id;
     private final int rate;
     private static final String TAG = "Device Connection";
     private static final boolean D = true;
@@ -35,7 +31,6 @@ public class DeviceConnection{
         if (D) Log.d(TAG, "\nConstructing DeviceConnection\nDevice: " + waxDevice.getName() + "\nID: "+id);
         this.storageDirectory = storageDirectory;
         this.waxDevice = waxDevice;
-        this.id = id;
         this.location = location;
         Log.d(TAG, "Device Connection for " + waxDevice.getName() + " on " + location + " created.");
         this.rate = rate;
@@ -73,7 +68,7 @@ public class DeviceConnection{
 
         // Start communication
         Log.d(TAG, "Creating Thread for " + location);
-        connection = new ConnectedThread(mSocket, id, storageDirectory, location, rate);
+        connection = new ConnectedThread(mSocket, storageDirectory, location, rate);
         mConnected = new Thread(connection);
         mConnected.start();
 
@@ -86,7 +81,7 @@ public class DeviceConnection{
         try {
             mConnected.join();
         } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            Log.e(TAG, "Interrupted whilst waiting for mConnected to terminate.");
         }
 
     }
