@@ -40,8 +40,8 @@ public class ConnectedThread implements Runnable {
         File file = new File(storageDirectory + "/log_" + location + "_" + c.get(Calendar.DATE) + "_" + c.get(Calendar.MONTH) +
                 "_" + c.get(Calendar.YEAR) + "_" + c.get(Calendar.HOUR_OF_DAY) + "_" + c.get(Calendar.MINUTE) + ".csv");
 
-        writerThread1 = new Writer(file, bigBuffer1); //runnable to do the writing
-        writerThread2 = new Writer(file, bigBuffer2); //runnable to do the writing
+        writerThread1 = new Writer(file, bigBuffer1);
+        writerThread2 = new Writer(file, bigBuffer2);
 
         if(D) Log.d(TAG, "Creating ConnectedThread");
 
@@ -110,11 +110,11 @@ public class ConnectedThread implements Runnable {
     }
 
     @Override
-    public synchronized void run() {
+    public void run() {
 
         try{
             writerThread1.start();
-            writerThread2.start();
+            //writerThread2.start();
             int bytes;
             boolean useBuffer1 = true;
 
@@ -139,11 +139,12 @@ public class ConnectedThread implements Runnable {
                     byte[] buffer = new byte[1024];
                     bytes = inStream.read(buffer);
 
-                    synchronized (bigBuffer1)
+                    synchronized (writerThread1)
                     {
                         bigBuffer1.add(new BufferWithSize(buffer, bytes));
+                        writerThread1.notify();
+
                     }
-                    writerThread1.notify();
 
                     /*
                     if(useBuffer1){
