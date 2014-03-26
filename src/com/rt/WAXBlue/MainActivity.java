@@ -26,14 +26,12 @@ public class MainActivity extends Activity {
 
     public Context mContext;
     private BluetoothConnector bConn;                           //Connector to set up and manage threads for BT devices
-    private BluetoothAdapter mBluetoothAdapter;                 //Default Bluetooth adapter
     private Set<BluetoothDevice> pairedDevicesSet;              //Set of devices paired with phone
     private ListView pairedDeviceListView;
     private List<String> pairedDevicesList;                     //List of device names paired with phone
     private List<DeviceToBeAdded> addedDevicesList;             //List of devices to be connected to
     private ArrayAdapter<String> deviceDisplayArrayAdapter;     //Paired devices array adapter
     private File storageDirectory;
-    private int connectionCount = 0;
 
     private GridView locationsGridView;                         //GridView to display the locations at which the devices
     //will be attached
@@ -129,8 +127,7 @@ public class MainActivity extends Activity {
             displayToast("Cannot Write to External Storage :(");
             finish();
         }else{
-            if (createDirectoryForStorage()) {
-            }else{
+            if (!createDirectoryForStorage()) {
                 displayToast("Cannot Log Data");
                 finish();
             }
@@ -183,12 +180,12 @@ public class MainActivity extends Activity {
     }
     /**
      * Checks that bluetooth is supported, enabled and that there are devices paired.
-     * @return
+     * @return true if bluetooth connection successful
      */
     private boolean checkBluetooth() {
 
         //Retrieve adapter
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         //Check that Bluetooth is supported on Android Device
         if (mBluetoothAdapter == null) {
@@ -197,12 +194,13 @@ public class MainActivity extends Activity {
         }
 
         // Check if enabled
-        if (!mBluetoothAdapter.isEnabled()) {
+        if (!(mBluetoothAdapter != null && mBluetoothAdapter.isEnabled())) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
 
         //Retrieve set of paired devices
+        assert mBluetoothAdapter != null;
         pairedDevicesSet = mBluetoothAdapter.getBondedDevices();
         populatePairedDevices();
 
@@ -229,9 +227,7 @@ public class MainActivity extends Activity {
         pairedDevicesList.clear();
         populatePairedDevices();
         locationsList.clear();
-        for (int i = 0; i < locations.length; i++) {
-            locationsList.add(locations[i]);
-        }
+        Collections.addAll(locationsList, locations);
         deviceDisplayArrayAdapter.notifyDataSetChanged();
         locationDisplayArrayAdapter.notifyDataSetChanged();
         //TODO more clear code
@@ -287,7 +283,7 @@ public class MainActivity extends Activity {
     public void connectClick(View v) {
         // Get number of devices
         // Start bluetooth connection
-        bConn = new BluetoothConnector(addedDevicesList, storageDirectory, this);
+        bConn = new BluetoothConnector(addedDevicesList, storageDirectory);
         bConn.start();
     }
 

@@ -12,13 +12,12 @@ public class BluetoothConnector extends Thread {
 
     private static final String TAG = "Bluetooth Connector";
     private static final boolean D = true;
-    public static int connectionCount = 0;
 
     /**
      * Constructor
      * @param devices list of device names to be streamed from
      */
-    public BluetoothConnector(List<DeviceToBeAdded> devices, File storageDirectory, Context mContext) {
+    public BluetoothConnector(List<DeviceToBeAdded> devices, File storageDirectory) {
 
         // Initialised later
         if(D) Log.d(TAG, "Devices: " + devices.toString());
