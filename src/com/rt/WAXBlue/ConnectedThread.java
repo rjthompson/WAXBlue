@@ -13,7 +13,7 @@ public class ConnectedThread implements Runnable {
     private BufferedInputStream inStream;
     private BluetoothSocket socket;
     private volatile boolean running = true;
-    private final Writer writerThread1;
+    private Writer writerThread1;
     private int mode;
     private LinkedList<byte[]> bigBuffer = new LinkedList<byte[]>();
     private ReadyCounter ready;
@@ -103,9 +103,15 @@ public class ConnectedThread implements Runnable {
         } catch (IOException e) {
             Log.e(TAG, "Failed to close Socket: "+e.getMessage());
         } catch (InterruptedException e) {
-            Log.e(TAG, "Interrupted");
         }
         running = false;
+
+        try {
+            Thread.sleep(5);
+        } catch (InterruptedException e) {
+            Log.e(TAG, "Interrupted");
+        }
+
         writerThread1.shutdown();
 
     }

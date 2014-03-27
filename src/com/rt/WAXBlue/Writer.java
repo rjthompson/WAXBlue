@@ -20,7 +20,7 @@ public class Writer extends Thread{
     private FileOutputStream fos;
 
     private LinkedList<byte[]> bigBuffer;
-    private boolean isRunning=true;
+    private boolean isRunning = true;
 
     public Writer(File file, LinkedList<byte[]> bigBuffer){
         try {
@@ -30,27 +30,23 @@ public class Writer extends Thread{
             fos = new FileOutputStream(file, true);
 
         } catch (IOException e) {
-            Log.e(TAG, "Failed to created Buffered Writer");
+            Log.e(TAG, "Failed to created File output stream: "+e.getMessage());
         }
+
         this.bigBuffer = bigBuffer;
 
     }
 
-    public synchronized void go(){
-        isRunning = true;
-        notify();
-    }
-
     @Override
     public synchronized void run() {
-
+        /*
         long time = System.currentTimeMillis();
         try {
             fos.write((time+"\r\n").getBytes());
         } catch (IOException e) {
             Log.e(TAG, "Write Error");
         }
-
+        */
 
 
         while(isRunning){
@@ -58,7 +54,7 @@ public class Writer extends Thread{
             try {
                 wait();
 
-            } catch (InterruptedException ignored) {
+            } catch (InterruptedException e) {
             }
 
             // Write all the data we have
@@ -84,7 +80,7 @@ public class Writer extends Thread{
                 try {
                     fos.write(buffer);
                 } catch (IOException e2) {
-                    Log.e(TAG, "Failed Writing to file");
+                    Log.e(TAG, "Failed Writing to file: "+ e2.getMessage());
                 }
 
                 //pause();
@@ -96,17 +92,24 @@ public class Writer extends Thread{
     }
 
     public synchronized void shutdown(){
+       /*
+        long time = System.currentTimeMillis();
         try {
-            long time = System.currentTimeMillis();
-            try {
-                fos.write(("\r\n" + time).getBytes());
-            } catch (IOException e) {
-                Log.e(TAG, "Write Error");
-            }
-            notify();
-            fos.close();
+            fos.write(("\r\n" + time).getBytes());
         } catch (IOException e) {
-            Log.e(TAG, "Failed to close buffered writer");
+            Log.e(TAG, "Write Error");
+        } */
+        isRunning = false;
+        notify();
+
+        try {
+
+            fos.close();
+
+        } catch (IOException e) {
+
+            Log.e(TAG, "Failed to close file output stream: "+e.getMessage());
+
         }
     }
 }

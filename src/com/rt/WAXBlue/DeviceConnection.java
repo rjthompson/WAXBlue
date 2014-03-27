@@ -80,7 +80,10 @@ public class DeviceConnection{
 
 
     public void stopStream(){
-        if(connection!=null)
+
+        connection.stopStream();
+
+        /*if(connection!=null)
             connection.stopStream();
         if(mConnected!=null) if (mConnected.isAlive()) {
             try {
@@ -88,7 +91,7 @@ public class DeviceConnection{
             } catch (InterruptedException e) {
                 Log.e(TAG, "Interrupted whilst waiting for mConnected to terminate.");
             }
-        }
+        } */
     }
 
 }
