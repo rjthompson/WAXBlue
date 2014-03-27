@@ -309,6 +309,7 @@ public class MainActivity extends Activity {
     }
 
     private void showConnectionButtons() {
+        findViewById(R.id.rateEntry).setVisibility(View.VISIBLE);
         findViewById(R.id.streamButton).setVisibility(View.VISIBLE);
         findViewById(R.id.connectButton).setVisibility(View.VISIBLE);
         findViewById(R.id.stopButton).setVisibility(View.VISIBLE);

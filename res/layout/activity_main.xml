@@ -44,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:layout_marginRight="5dp"
-                android:text="Finish"
+                android:text="@string/finish"
                 android:onClick="finishClick"
                 android:visibility="visible"
                 />
@@ -53,7 +53,7 @@
                 android:id="@+id/clearSelectedButton"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:text="Clear Selected"
+                android:text="@string/clearSelected"
                 android:layout_toRightOf="@+id/finishButton"
                 android:onClick="clearSelectedClick"
                 android:visibility="visible"
@@ -65,11 +65,21 @@
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:layout_marginLeft="5dp"
-                android:text="Clear All"
+                android:text="@string/clearAll"
                 android:onClick="clearClick"
                 android:visibility="visible"
                 />
     </RelativeLayout>
+
+    <EditText
+            android:id="@+id/rateEntry"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_below="@+id/locationGridView"
+            android:layout_marginTop="5dp"
+            android:visibility="invisible"
+            android:hint="Rate(Hz)"
+            android:inputType="numberDecimal"/>
 
     <RelativeLayout
             android:id="@+id/connectButtonGroup"
