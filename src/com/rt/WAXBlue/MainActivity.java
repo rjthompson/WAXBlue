@@ -22,6 +22,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import static java.lang.Integer.parseInt;
+
 public class MainActivity extends Activity {
 
     public Context mContext;
@@ -283,7 +285,9 @@ public class MainActivity extends Activity {
     public void connectClick(View v) {
         // Get number of devices
         // Start bluetooth connection
-        bConn = new BluetoothConnector(addedDevicesList, storageDirectory);
+        EditText rateEntry = (EditText) findViewById(R.id.rateEntry);
+        int rate = parseInt(rateEntry.getText().toString());
+        bConn = new BluetoothConnector(addedDevicesList, storageDirectory, rate);
         bConn.start();
     }
 

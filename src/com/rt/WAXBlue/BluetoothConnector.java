@@ -13,15 +13,16 @@ public class BluetoothConnector extends Thread {
     private static final String TAG = "Bluetooth Connector";
     private static final boolean D = true;
     private ReadyCounter ready;
+    private int rate;
     /**
      * Constructor
      * @param devices list of device names to be streamed from
      */
-    public BluetoothConnector(List<DeviceToBeAdded> devices, File storageDirectory) {
+    public BluetoothConnector(List<DeviceToBeAdded> devices, File storageDirectory, int rate) {
 
         // Initialised later
         if(D) Log.d(TAG, "Devices: " + devices.toString());
-
+        this.rate = rate;
         ready = new ReadyCounter(devices.size());
 
         connections = new DeviceConnection[devices.size()];
@@ -39,7 +40,7 @@ public class BluetoothConnector extends Thread {
                 if (D) Log.d(TAG, "Attempting to create new Device Connection with " + device.getName() + " on " + d.getLocation());
 
                 //TODO rate variable
-                connections[counter] = new DeviceConnection(device, counter, storageDirectory, d.getLocation(), 80, ready);
+                connections[counter] = new DeviceConnection(device, counter, storageDirectory, d.getLocation(), rate, ready);
                 if (D) Log.d(TAG, "New Device Connections Created Successfully");
                 counter++;
 
