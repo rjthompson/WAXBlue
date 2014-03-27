@@ -13,11 +13,10 @@ public class ConnectedThread implements Runnable {
     private BufferedInputStream inStream;
     private BluetoothSocket socket;
     private volatile boolean running = true;
-    private Writer writerThread1;
-    private Writer writerThread2;
-    private LinkedList<BufferWithSize> bigBuffer1 = new LinkedList<BufferWithSize>();
-    private LinkedList<BufferWithSize> bigBuffer2 = new LinkedList<BufferWithSize>();
-
+    private final Writer writerThread1;
+    private int mode;
+    private LinkedList<byte[]> bigBuffer = new LinkedList<byte[]>();
+    private ReadyCounter ready;
     private int rate;
     private static final String TAG = "Connected Thread";
     private static final boolean D = false;
@@ -29,19 +28,25 @@ public class ConnectedThread implements Runnable {
      * Constructor for performing socket read/write
      * @param socket Bluetooth socket
      */
-    public ConnectedThread(BluetoothSocket socket, File storageDirectory, String location, int rate) {
+    public ConnectedThread(BluetoothSocket socket, File storageDirectory, String location, int rate, int mode, ReadyCounter ready) {
 
         this.socket = socket; //Bluetooth socket
-
+        this.mode = mode;
         this.rate = rate;
+        this.ready = ready;
 
         Calendar c = Calendar.getInstance();
         location = location.replaceAll("\\s+", "");
+        String fType;
+        if(mode == 0 || mode == 128){
+            fType = ".csv";
+        }else{
+            fType = "";
+        }
         File file = new File(storageDirectory + "/log_" + location + "_" + c.get(Calendar.DATE) + "_" + c.get(Calendar.MONTH) +
-                "_" + c.get(Calendar.YEAR) + "_" + c.get(Calendar.HOUR_OF_DAY) + "_" + c.get(Calendar.MINUTE) + ".csv");
+                "_" + c.get(Calendar.YEAR) + "_" + c.get(Calendar.HOUR_OF_DAY) + "_" + c.get(Calendar.MINUTE) + fType);
 
-        writerThread1 = new Writer(file, bigBuffer1);
-        writerThread2 = new Writer(file, bigBuffer2);
+        writerThread1 = new Writer(file, bigBuffer);
 
         if(D) Log.d(TAG, "Creating ConnectedThread");
 
@@ -49,8 +54,6 @@ public class ConnectedThread implements Runnable {
             inStream = new BufferedInputStream(socket.getInputStream(), 2048);
 
             outStream = socket.getOutputStream();
-
-            //bufferedWriter = new BufferedWriter(new FileWriter(file, true));
 
         } catch (IOException e) {
 
@@ -67,13 +70,12 @@ public class ConnectedThread implements Runnable {
         }
     }
 
-    public void setDataMode(boolean longMode){
-        int mode;
-        if(longMode){
-            mode = 128;
-        }else{
+    public void setDataMode(int mode){
+
+        if(!(mode == 0 || mode == 128 || mode == 1 || mode == 129)){
             mode = 0;
         }
+
         try {
             outStream.write(("datamode " + mode + "\r\n\r\n").getBytes());
         } catch (IOException e) {
@@ -105,7 +107,6 @@ public class ConnectedThread implements Runnable {
         }
         running = false;
         writerThread1.shutdown();
-        writerThread2.shutdown();
 
     }
 
@@ -114,17 +115,19 @@ public class ConnectedThread implements Runnable {
 
         try{
             writerThread1.start();
-            //writerThread2.start();
-            int bytes;
-            boolean useBuffer1 = true;
 
             try {
 
                 Thread.sleep(200);
                 setRate(rate);
                 Thread.sleep(200);
-                setDataMode(true);
+                setDataMode(mode);
                 Thread.sleep(200);
+
+                ready.decrement();
+                while(ready.getValue()!=0){
+                    Thread.sleep(100);
+                }
                 startStream();
 
                 //TODO semaphore for all threads to go.
@@ -134,54 +137,13 @@ public class ConnectedThread implements Runnable {
             }
 
             while (running) {
+                byte[] buffer = new byte[1024];
 
-                try {
-                    byte[] buffer = new byte[1024];
-                    bytes = inStream.read(buffer);
+                synchronized (writerThread1) {
+                    bigBuffer.add(buffer);
+                    writerThread1.notify();
 
-                    synchronized (writerThread1)
-                    {
-                        bigBuffer1.add(new BufferWithSize(buffer, bytes));
-                        writerThread1.notify();
-
-                    }
-
-                    /*
-                    if(useBuffer1){
-
-                        bigBuffer1.add(new BufferWithSize(buffer, bytes));
-
-                        if(bigBuffer1.size() > 1000){
-                            writerThread1.go();
-                            useBuffer1 = false;
-                        }
-
-
-
-                    }else{
-
-                        bigBuffer2.add(new BufferWithSize(buffer, bytes));
-
-                        if (bigBuffer2.size() > 1000) {
-                            writerThread2.go();
-                            useBuffer1 = true;
-                        }
-                    }
-                    */
-
-                    //parseOutStream.write(buffer, 0, bytes);
-                    //String data = new String(buffer, 0, bytes);
-
-
-
-                    //bufferedWriter.append(data);
-
-                    //TODO Check data against regex
-
-                } catch (IOException e) {
-                    break;
                 }
-
             }
         }finally{
 
@@ -197,22 +159,4 @@ public class ConnectedThread implements Runnable {
 
     }
 
-    public static class BufferWithSize {
-
-        private byte[] buffer;
-        private int size;
-
-        public BufferWithSize(byte[] buffer, int size) {
-            this.buffer = buffer;
-            this.size = size;
-        }
-
-        public byte[] getBuffer() {
-            return buffer;
-        }
-
-        public int getSize() {
-            return size;
-        }
-    }
 }
