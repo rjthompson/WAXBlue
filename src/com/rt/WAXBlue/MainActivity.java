@@ -8,12 +8,14 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.*;
 
 import java.io.File;
@@ -51,7 +53,8 @@ public class MainActivity extends Activity {
     private static final int REQUEST_ENABLE_BT = 1;             //Int to allow for BT enabling request
     private static final String TAG = "Main Activity";          //Debugging tag
     private static final boolean D = true;                      //Flag to turn on or off debug logging
-    private int mode;
+    private int mode;                                           //Is the keyboard displayed?
+    boolean isOpened = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -317,7 +320,7 @@ public class MainActivity extends Activity {
         EditText rateEntry = (EditText) findViewById(R.id.rateEntry);
         int rate = parseInt(rateEntry.getText().toString());
         if(rate<=0){
-            rate = 40;
+            rate = 50;
         }
         //ensure mode has been set
         if(mode!=-1){
@@ -353,6 +356,7 @@ public class MainActivity extends Activity {
 
     private void showConnectionButtons() {
         findViewById(R.id.connectButtonGroup).setVisibility(View.VISIBLE);
+        findViewById(R.id.rateGroup).setVisibility(View.VISIBLE);
         findViewById(R.id.modeGroup).setVisibility(View.VISIBLE);
     }
 
@@ -370,6 +374,8 @@ public class MainActivity extends Activity {
         findViewById(R.id.clearSelectedButton).setVisibility(View.INVISIBLE);
         findViewById(R.id.finishButton).setVisibility(View.INVISIBLE);
     }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

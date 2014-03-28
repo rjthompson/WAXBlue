@@ -6,12 +6,12 @@
     <string name="finish">Finish</string>
     <string name="clearSelected">Clear Selected</string>
     <string name="clearAll">Clear All</string>
-    <string name="rate">Rate(50Hz)</string>
+    <string name="rate">Rate (50Hz)</string>
     <string name="connect">Connect</string>
     <string name="stream">Stream</string>
     <string name="stop">Stop</string>
     <string name="mode_text">Text</string>
-    <string name="mode_text_long">Text - L</string>
+    <string name="mode_text_long">Text\nLong</string>
     <string name="mode_binary">Binary</string>
-    <string name="mode_binary_long">Binary - L</string>
+    <string name="mode_binary_long">Binary\nLong</string>
 </resources>

@@ -6,17 +6,18 @@
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_vertical_margin"
-                tools:context=".MainActivity" >
+                tools:context=".MainActivity">
+
     <GridView
             android:id="@+id/locationGridView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:numColumns="auto_fit"
             android:stretchMode="columnWidth"
-            android:verticalSpacing="10dp"
-            android:horizontalSpacing="10dp"
+            android:verticalSpacing="10sp"
+            android:horizontalSpacing="10sp"
             android:gravity="center"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="5sp"
             android:layout_alignParentTop="true"
             />
 
@@ -28,8 +29,8 @@
             android:layout_below="@+id/locationGridView"
             android:layout_above="@+id/pairButtonGroup"
             android:background="@drawable/horse"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="10dp"/>
+            android:layout_marginTop="5sp"
+            android:layout_marginBottom="10sp"/>
 
 
     <RelativeLayout
@@ -39,11 +40,12 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             >
+
         <Button
                 android:id="@+id/finishButton"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:layout_marginRight="5dp"
+                android:layout_marginRight="5sp"
                 android:text="@string/finish"
                 android:onClick="finishClick"
                 android:visibility="visible"
@@ -64,7 +66,7 @@
                 android:layout_toRightOf="@+id/clearSelectedButton"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:layout_marginLeft="5dp"
+                android:layout_marginLeft="5sp"
                 android:text="@string/clearAll"
                 android:onClick="clearClick"
                 android:visibility="visible"
@@ -77,38 +79,85 @@
             android:layout_width="match_parent"
             android:orientation="horizontal"
             android:visibility="invisible"
-            android:layout_above="@+id/connectButtonGroup"
-            android:paddingBottom="5dp"
-            android:layout_marginBottom="5dp">
+            android:layout_marginBottom="5sp"
+            android:gravity="center"
+            android:layout_above="@+id/rateGroup"
+            >
+
 
         <RadioButton
                 android:id="@+id/text"
+                android:textSize="18sp"
+
+                android:layout_gravity="fill"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="50sp"
                 android:text="@string/mode_text"
+                android:layout_marginRight="5sp"
                 android:onClick="onRadioButtonClicked"/>
+
         <RadioButton
                 android:id="@+id/textLong"
+                android:textSize="18sp"
+                android:layout_gravity="fill"
                 android:checked="true"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="50sp"
+                android:layout_marginRight="5sp"
+
                 android:text="@string/mode_text_long"
                 android:onClick="onRadioButtonClicked"/>
 
         <RadioButton
                 android:id="@+id/binary"
+                android:textSize="18sp"
+                android:layout_gravity="fill"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="50sp"
+                android:layout_marginRight="5sp"
+
                 android:text="@string/mode_binary"
                 android:onClick="onRadioButtonClicked"/>
 
         <RadioButton
                 android:id="@+id/binLong"
+                android:textSize="18sp"
+                android:layout_gravity="fill"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="50sp"
                 android:text="@string/mode_binary_long"
                 android:onClick="onRadioButtonClicked"/>
     </RadioGroup>
+
+    <RelativeLayout
+            android:id="@+id/rateGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_above="@+id/connectButtonGroup"
+            android:visibility="invisible"
+            android:layout_marginTop="5sp"
+            android:layout_marginBottom="25sp"
+            >
+
+        <TextView
+                android:id="@+id/rateLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="50sp"
+                android:text="@string/rate"
+                android:textSize="18sp"
+                android:gravity="bottom"
+                />
+
+        <EditText
+                android:id="@+id/rateEntry"
+                android:layout_height="50sp"
+                android:layout_width="50sp"
+                android:inputType="numberDecimal"
+                android:layout_toRightOf="@+id/rateLabel"
+                />
+    </RelativeLayout>
+
     <RelativeLayout
             android:id="@+id/connectButtonGroup"
             android:layout_width="wrap_content"
@@ -116,23 +165,14 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:visibility="invisible"
-
+            android:layout_marginTop="5sp"
             >
-
-        <EditText
-                android:id="@+id/rateEntry"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:layout_marginTop="5dp"
-                android:hint="@string/rate"
-                android:textSize="14sp"
-                android:inputType="numberDecimal"/>
 
         <Button
                 android:id="@+id/connectButton"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:layout_marginRight="5dp"
+                android:layout_marginRight="5sp"
                 android:text="@string/connect"
                 android:layout_toRightOf="@+id/rateEntry"
                 android:onClick="connectClick"/>
@@ -150,7 +190,7 @@
                 android:layout_toRightOf="@+id/streamButton"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:layout_marginLeft="5dp"
+                android:layout_marginLeft="5sp"
                 android:text="@string/stop"
                 android:onClick="stopClick"/>
     </RelativeLayout>
