@@ -51,7 +51,7 @@ public class MainActivity extends Activity {
     private static final int REQUEST_ENABLE_BT = 1;             //Int to allow for BT enabling request
     private static final String TAG = "Main Activity";          //Debugging tag
     private static final boolean D = true;                      //Flag to turn on or off debug logging
-
+    private int mode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -277,18 +277,57 @@ public class MainActivity extends Activity {
                 .show();
     }
 
+    public void onRadioButtonClicked(View view) {
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
+
+        // Check which radio button was clicked
+        switch (view.getId()) {
+            case R.id.text:
+                if (checked)
+                    mode = 0;
+                break;
+            case R.id.textLong:
+                if (checked)
+                    mode = 128;
+                break;
+            case R.id.binary:
+                if (checked)
+                    mode = 1;
+                break;
+            case R.id.binLong:
+                if (checked)
+                    mode = 129;
+                break;
+            default:
+                mode = -1;
+                break;
+        }
+    }
+
+
     /**
      * Initiate Bluetooth connection
      *
      * @param v View
      */
     public void connectClick(View v) {
-        // Get number of devices
-        // Start bluetooth connection
+
+        //get rate from text input box
         EditText rateEntry = (EditText) findViewById(R.id.rateEntry);
         int rate = parseInt(rateEntry.getText().toString());
-        bConn = new BluetoothConnector(addedDevicesList, storageDirectory, rate);
-        bConn.start();
+        if(rate<=0){
+            rate = 40;
+        }
+        //ensure mode has been set
+        if(mode!=-1){
+            // Get number of devices
+            // Start bluetooth connection
+            bConn = new BluetoothConnector(addedDevicesList, storageDirectory, rate, mode);
+            bConn.start();
+        }else{
+            displayToast("Please select an output mode");
+        }
     }
 
 
@@ -313,6 +352,7 @@ public class MainActivity extends Activity {
     }
 
     private void showConnectionButtons() {
+        findViewById(R.id.modeGroup).setVisibility(View.VISIBLE);
         findViewById(R.id.rateEntry).setVisibility(View.VISIBLE);
         findViewById(R.id.streamButton).setVisibility(View.VISIBLE);
         findViewById(R.id.connectButton).setVisibility(View.VISIBLE);

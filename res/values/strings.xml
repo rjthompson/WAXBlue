@@ -10,4 +10,8 @@
     <string name="connect">Connect</string>
     <string name="stream">Stream</string>
     <string name="stop">Stop</string>
+    <string name="mode_text">Text</string>
+    <string name="mode_text_long">Text - L</string>
+    <string name="mode_binary">Binary</string>
+    <string name="mode_binary_long">Binary - L</string>
 </resources>

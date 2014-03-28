@@ -137,15 +137,19 @@ public class ConnectedThread implements Runnable {
             }
 
             while (running) {
+                int bytes = 0;
+
                 byte[] buffer = new byte[1024];
                 try {
-                    inStream.read(buffer);
+                    bytes = inStream.read(buffer);
                 } catch (IOException e) {
-                    Log.d(TAG, "Failed to read");
+                    Log.e(TAG, "Failed to read: "+e.getMessage(), e);
                 }
                 synchronized (writerThread1) {
-                    bigBuffer.add(buffer);
-                    writerThread1.notify();
+                    if(bytes>0){
+                        bigBuffer.add(buffer);
+                        writerThread1.notify();
+                    }
                 }
             }
         }finally{

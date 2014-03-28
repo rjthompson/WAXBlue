@@ -71,7 +71,43 @@
                 />
     </RelativeLayout>
 
+    <RadioGroup
+            android:id="@+id/modeGroup"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:visibility="invisible"
+            android:layout_above="@+id/connectButtonGroup"
+            android:paddingBottom="5dp"
+            android:layout_marginBottom="5dp">
 
+        <RadioButton
+                android:id="@+id/text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/mode_text"
+                android:onClick="onRadioButtonClicked"/>
+        <RadioButton
+                android:id="@+id/textLong"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/mode_text_long"
+                android:onClick="onRadioButtonClicked"/>
+
+        <RadioButton
+                android:id="@+id/binary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/mode_binary"
+                android:onClick="onRadioButtonClicked"/>
+
+        <RadioButton
+                android:id="@+id/binLong"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/mode_binary_long"
+                android:onClick="onRadioButtonClicked"/>
+    </RadioGroup>
     <RelativeLayout
             android:id="@+id/connectButtonGroup"
             android:layout_width="wrap_content"

@@ -26,8 +26,9 @@ public class DeviceConnection{
     private String location;
     private ReadyCounter ready;
     private static final String UUID_STRING = "00001101-0000-1000-8000-00805f9b34fb";
+    private int mode;
 
-    public DeviceConnection(BluetoothDevice waxDevice, final int id, File storageDirectory, String location, int rate, ReadyCounter ready) {
+    public DeviceConnection(BluetoothDevice waxDevice, final int id, File storageDirectory, String location, int rate, int mode, ReadyCounter ready) {
         if (D) Log.d(TAG, "\nConstructing DeviceConnection\nDevice: " + waxDevice.getName() + "\nID: "+id);
 
         this.ready = ready;
@@ -37,7 +38,7 @@ public class DeviceConnection{
         Log.d(TAG, "Device Connection for " + waxDevice.getName() + " on " + location + " created.");
         this.rate = rate;
         mSocket = null;
-
+        this.mode = mode;
     }
 
 
@@ -71,7 +72,7 @@ public class DeviceConnection{
         // Start communication
         Log.d(TAG, "Creating Thread for " + location);
         //TODO put mode var in
-        connection = new ConnectedThread(mSocket, storageDirectory, location, rate, 128, ready);
+        connection = new ConnectedThread(mSocket, storageDirectory, location, rate, mode, ready);
         mConnected = new Thread(connection);
         mConnected.start();
 
