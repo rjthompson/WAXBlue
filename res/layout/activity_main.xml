@@ -119,14 +119,14 @@
                 android:text="@string/mode_binary"
                 android:onClick="onRadioButtonClicked"/>
 
-        <RadioButton
-                android:id="@+id/binLong"
-                android:textSize="18sp"
-                android:layout_gravity="fill"
-                android:layout_width="wrap_content"
-                android:layout_height="50sp"
-                android:text="@string/mode_binary_long"
-                android:onClick="onRadioButtonClicked"/>
+        <!--<RadioButton-->
+                <!--android:id="@+id/binLong"-->
+                <!--android:textSize="18sp"-->
+                <!--android:layout_gravity="fill"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="50sp"-->
+                <!--android:text="@string/mode_binary_long"-->
+                <!--android:onClick="onRadioButtonClicked"/>-->
     </RadioGroup>
 
     <RelativeLayout
@@ -146,13 +146,12 @@
                 android:layout_height="50sp"
                 android:text="@string/rate"
                 android:textSize="18sp"
-                android:gravity="bottom"
                 />
 
         <EditText
                 android:id="@+id/rateEntry"
                 android:layout_height="50sp"
-                android:layout_width="50sp"
+                android:layout_width="75sp"
                 android:inputType="numberDecimal"
                 android:layout_toRightOf="@+id/rateLabel"
                 />

@@ -53,8 +53,8 @@ public class MainActivity extends Activity {
     private static final int REQUEST_ENABLE_BT = 1;             //Int to allow for BT enabling request
     private static final String TAG = "Main Activity";          //Debugging tag
     private static final boolean D = true;                      //Flag to turn on or off debug logging
-    private int mode;                                           //Is the keyboard displayed?
-    boolean isOpened = false;
+    private int mode = 128;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -315,11 +315,15 @@ public class MainActivity extends Activity {
      * @param v View
      */
     public void connectClick(View v) {
+        int rate;
 
         //get rate from text input box
         EditText rateEntry = (EditText) findViewById(R.id.rateEntry);
-        int rate = parseInt(rateEntry.getText().toString());
-        if(rate<=0){
+        String rateText = rateEntry.getText().toString();
+        if(!rateText.equals("")){
+            rate = parseInt(rateText);
+
+        }else{
             rate = 50;
         }
         //ensure mode has been set

@@ -5,6 +5,7 @@ import android.util.Log;
 import java.io.*;
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedList;
 
@@ -19,10 +20,11 @@ public class Writer extends Thread{
 
     private volatile FileOutputStream fos;
 
-    private LinkedList<byte[]> bigBuffer;
+    private volatile LinkedList<byte[]> bigBuffer;
+    private volatile LinkedList<Integer> sizes;
     private boolean isRunning=true;
 
-    public Writer(File file, LinkedList<byte[]> bigBuffer){
+    public Writer(File file, LinkedList<byte[]> bigBuffer, LinkedList<Integer> sizes){
         try {
 
 
@@ -33,7 +35,7 @@ public class Writer extends Thread{
             Log.e(TAG, "Failed to created Buffered Writer");
         }
         this.bigBuffer = bigBuffer;
-
+        this.sizes = sizes;
     }
 
     public synchronized void go(){
@@ -68,18 +70,21 @@ public class Writer extends Thread{
 
 
                 byte[] buffer = null;
-
+                int size = 0;
                 // Safely get the next thing to write
                 synchronized (bigBuffer) {
                     if (bigBuffer.size() > 0) {
-                        buffer = bigBuffer.removeFirst();
+                        buffer = bigBuffer.removeLast();
+                        size = sizes.removeLast();
                     }
                 }
+
 
                 // Break out when we have no more data
                 if (buffer == null) {
                     break;
                 }
+                buffer = Arrays.copyOf(buffer, size);
 
                 try {
                     fos.write(buffer);
