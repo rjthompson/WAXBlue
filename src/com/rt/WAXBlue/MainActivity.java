@@ -8,14 +8,12 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.*;
 
 import java.io.File;
@@ -298,10 +296,10 @@ public class MainActivity extends Activity {
                 if (checked)
                     mode = 1;
                 break;
-            case R.id.binLong:
+           /* case R.id.binLong:
                 if (checked)
                     mode = 129;
-                break;
+                break;         */
             default:
                 mode = -1;
                 break;
@@ -328,10 +326,8 @@ public class MainActivity extends Activity {
         }
         //ensure mode has been set
         if(mode!=-1){
-            // Get number of devices
-            // Start bluetooth connection
+            // Get number of devices and initialise connection
             bConn = new BluetoothConnector(addedDevicesList, storageDirectory, rate, mode);
-            bConn.start();
         }else{
             displayToast("Please select an output mode");
         }

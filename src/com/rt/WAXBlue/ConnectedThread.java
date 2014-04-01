@@ -22,7 +22,7 @@ public class ConnectedThread implements Runnable {
     private int mode;
     private volatile LinkedList<byte[]> bigBuffer = new LinkedList<byte[]>();
     private volatile LinkedList<Integer> sizes = new LinkedList<Integer>();
-
+    private volatile boolean finished = false;
     private ReadyCounter ready;
     private int rate;
 
@@ -59,12 +59,12 @@ public class ConnectedThread implements Runnable {
         File file = new File(storageDirectory + "/log_" + location + "_" + c.get(Calendar.DATE) + "_" + month +
                 "_" + c.get(Calendar.YEAR) + "_" + c.get(Calendar.HOUR_OF_DAY) + "_" + c.get(Calendar.MINUTE) + fType);
 
-        writerThread1 = new Writer(file, bigBuffer, sizes);
+        writerThread1 = new Writer(file, bigBuffer, sizes, finished);
 
         if (D) Log.d(TAG, "Creating ConnectedThread");
 
         try {
-            inStream = new BufferedInputStream(socket.getInputStream(), 2048);
+            inStream = new BufferedInputStream(socket.getInputStream(), 2096);
 
             outStream = socket.getOutputStream();
 
@@ -116,12 +116,10 @@ public class ConnectedThread implements Runnable {
             Log.e(TAG, "Error writing to device: " + e.getMessage());
         }
         try {
-            Thread.sleep(1000);
-            socket.close();
+            if(finished)
+                socket.close();
         } catch (IOException e) {
             Log.e(TAG, "Failed to close Socket: " + e.getMessage());
-        } catch (InterruptedException e) {
-            Log.e(TAG, "Interrupted");
         }
         running = false;
         writerThread1.shutdown();

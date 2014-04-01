@@ -13,18 +13,17 @@ import java.util.LinkedList;
  * Author: Rob Thompson
  * Date: 24/03/2014
  */
-public class Writer extends Thread{
+public class Writer extends Thread {
 
     private static final String TAG = "Writer Thread";
     private static final boolean D = true;
-
     private volatile FileOutputStream fos;
-
     private volatile LinkedList<byte[]> bigBuffer;
     private volatile LinkedList<Integer> sizes;
-    private boolean isRunning=true;
+    private boolean isRunning = true;
+    private volatile boolean finished;
 
-    public Writer(File file, LinkedList<byte[]> bigBuffer, LinkedList<Integer> sizes){
+    public Writer(File file, LinkedList<byte[]> bigBuffer, LinkedList<Integer> sizes, boolean finished) {
         try {
 
 
@@ -36,9 +35,10 @@ public class Writer extends Thread{
         }
         this.bigBuffer = bigBuffer;
         this.sizes = sizes;
+        this.finished = finished;
     }
 
-    public synchronized void go(){
+    public synchronized void go() {
         isRunning = true;
         notify();
     }
@@ -48,14 +48,13 @@ public class Writer extends Thread{
 
         long time = System.currentTimeMillis();
         try {
-            fos.write((time+"\r\n").getBytes());
+            fos.write((time + "\r\n").getBytes());
         } catch (IOException e) {
             Log.e(TAG, "Write Error");
         }
 
 
-
-        while(isRunning){
+        while (isRunning) {
             // Wait until we have data
             try {
                 wait();
@@ -64,9 +63,7 @@ public class Writer extends Thread{
             }
 
             // Write all the data we have
-            for ( ; ; ) {
-
-
+            for (; ; ) {
 
 
                 byte[] buffer = null;
@@ -89,34 +86,38 @@ public class Writer extends Thread{
                 try {
                     fos.write(buffer);
                 } catch (IOException e2) {
-                    Log.e(TAG, "Failed Writing to file: "+e2.getMessage());
+                    Log.e(TAG, "Failed Writing to file: " + e2.getMessage());
                 }
 
                 //pause();
             }
+
         }
 
-
-
-    }
-
-    public synchronized void shutdown(){
-
-        long time = System.currentTimeMillis();
+        time = System.currentTimeMillis();
         try {
             fos.write(("\r\n" + time).getBytes());
         } catch (IOException e) {
             Log.e(TAG, "Write Error", e);
-        }finally{
-
-            try {
-                fos.close();
-            } catch (IOException e) {
-                Log.e(TAG, "Failed to closed file output stream", e);
-            }
-            notify();
         }
+        finished = true;
+        notify();
 
+    }
 
+    public synchronized void shutdown() {
+
+        isRunning = false;
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Log.e(TAG, "Interrupted sleep");
+        }
+        try {
+            fos.close();
+        } catch (IOException e) {
+            Log.e(TAG, "Failed to closed file output stream", e);
+        }
+        notify();
     }
 }

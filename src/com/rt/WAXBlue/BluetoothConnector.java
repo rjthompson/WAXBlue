@@ -7,7 +7,7 @@ import android.util.Log;
 import java.io.File;
 import java.util.List;
 
-public class BluetoothConnector extends Thread {
+public class BluetoothConnector{
     private DeviceConnection[] connections;
 
     private static final String TAG = "Bluetooth Connector";
