@@ -2,11 +2,10 @@ package com.rt.WAXBlue;
 
 import android.util.Log;
 
-import java.io.*;
-import java.sql.Time;
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.LinkedList;
 
 /**
@@ -15,37 +14,41 @@ import java.util.LinkedList;
  */
 public class Writer extends Thread {
 
-    private static final String TAG = "Writer Thread";
-    private static final boolean D = true;
-    private volatile FileOutputStream fos;
-    private volatile LinkedList<byte[]> bigBuffer;
-    private volatile LinkedList<Integer> sizes;
-    private boolean isRunning = true;
-    private volatile boolean finished;
+    private static final String TAG = "Writer Thread";     //Log Tag
+    private static final boolean D = true;                 //Log flag, set to true to print debug messages
+    private volatile FileOutputStream fos;                 //File output stream used to write.
+    private volatile LinkedList<byte[]> bigBuffer;         //Linked list containing byte[] buffers with data from device
+    private volatile LinkedList<Integer> sizes;            //Linked list containing sizes of byte[] buffers
+    private boolean isRunning = true;                      //Flag to keep run loop going.
 
-    public Writer(File file, LinkedList<byte[]> bigBuffer, LinkedList<Integer> sizes, boolean finished) {
+    /**
+     *
+     * @param file      File to write to.
+     * @param bigBuffer Linked list containing byte[] buffers with data from device
+     * @param sizes     Linked list containing sizes of byte[] buffers
+     */
+    public Writer(File file, LinkedList<byte[]> bigBuffer, LinkedList<Integer> sizes) {
+
+        if(D) Log.d(TAG, "Creating new Writer Thread");
+
+        //Create file output stream to write with
         try {
-
-
-            //bufferedWriter = new BufferedWriter(new FileWriter(file, true));
             fos = new FileOutputStream(file, true);
-
         } catch (IOException e) {
             Log.e(TAG, "Failed to created Buffered Writer");
         }
-        this.bigBuffer = bigBuffer;
-        this.sizes = sizes;
-        this.finished = finished;
-    }
 
-    public synchronized void go() {
-        isRunning = true;
-        notify();
+
+        this.bigBuffer = bigBuffer;                            //Linked list containing data to be written
+        this.sizes = sizes;                                    //Linked list containing size information about data.
     }
 
     @Override
     public synchronized void run() {
 
+        if (D) Log.d(TAG, "Running Writer Thread");
+
+        //Write timestamp to data.
         long time = System.currentTimeMillis();
         try {
             fos.write((time + "\r\n").getBytes());
@@ -53,8 +56,9 @@ public class Writer extends Thread {
             Log.e(TAG, "Write Error");
         }
 
-
+        //Loop until told to stop.
         while (isRunning) {
+
             // Wait until we have data
             try {
                 wait();
@@ -68,7 +72,8 @@ public class Writer extends Thread {
 
                 byte[] buffer = null;
                 int size = 0;
-                // Safely get the next thing to write
+
+                // Safely get the next thing to write and its size
                 synchronized (bigBuffer) {
                     if (bigBuffer.size() > 0) {
                         buffer = bigBuffer.removeLast();
@@ -81,43 +86,53 @@ public class Writer extends Thread {
                 if (buffer == null) {
                     break;
                 }
+
+                //Trim buffer to remove null values
                 buffer = Arrays.copyOf(buffer, size);
 
+                //write the buffer contents to the file
                 try {
                     fos.write(buffer);
                 } catch (IOException e2) {
                     Log.e(TAG, "Failed Writing to file: " + e2.getMessage());
                 }
 
-                //pause();
             }
 
         }
 
+        //Write timestamp when finished.
         time = System.currentTimeMillis();
         try {
             fos.write(("\r\n" + time).getBytes());
         } catch (IOException e) {
             Log.e(TAG, "Write Error", e);
         }
-        finished = true;
-        notify();
-
     }
 
+    /**
+     * Called when the stop button is press. Shuts down the writer thread.
+     */
     public synchronized void shutdown() {
 
+        if (D) Log.d(TAG, "Stopping Writer Thread");
+
+        //stop run loop
         isRunning = false;
+
+        //give time for run to finish writing.
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             Log.e(TAG, "Interrupted sleep");
         }
+
+        //close the file output stream
         try {
             fos.close();
         } catch (IOException e) {
             Log.e(TAG, "Failed to closed file output stream", e);
         }
-        notify();
+
     }
 }
