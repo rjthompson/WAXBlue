@@ -12,70 +12,78 @@ import java.util.LinkedList;
 
 public class ConnectedThread implements Runnable {
 
-    private static final String TAG = "Connected Thread";
-    private static final boolean D = false;
-    private final Writer writerThread1;
-    private OutputStream outStream;
-    private BufferedInputStream inStream;
-    private BluetoothSocket socket;
-    private volatile boolean running = true;
-    private int mode;
-    private volatile LinkedList<byte[]> bigBuffer = new LinkedList<byte[]>();
-    private volatile LinkedList<Integer> sizes = new LinkedList<Integer>();
-    private volatile boolean finished = false;
-    private ReadyCounter ready;
-    private int rate;
-
-
-    //TODO Write methods efficientise.
+    private static final String TAG = "Connected Thread";                     //Logging Tag
+    private static final boolean D = false;                                   //Logging Flag
+    private final Writer writerThread;                                        //Thread for writing concurrently
+    private OutputStream outStream;                                           //Output stream for writing to device
+    private BufferedInputStream inStream;                                     //Input stream for reading from device
+    private BluetoothSocket socket;                                           //Device socket
+    private int mode;                                                         //Recording mode (Binary or ASCII)
+    private int rate;                                                         //Sample rate
+    private volatile LinkedList<byte[]> bigBuffer = new LinkedList<byte[]>(); //Buffer to contain byte[] with data
+    private volatile LinkedList<Integer> sizes = new LinkedList<Integer>();   //Buffer to contain sizes of byte[]s
+    private volatile boolean running = true;                                  //Flag for run loop
+    private ReadyCounter ready;                                               //Semaphore to synchronize streaming
 
     /**
-     * Constructor for performing socket read/write
      *
-     * @param socket Bluetooth socket
+     * @param socket            Bluetooth socket to device
+     * @param storageDirectory  Directory to save device output
+     * @param location          Location at which device is mounted
+     * @param rate              Sample rate to record at from device
+     * @param mode              Mode of operation of device
+     * @param ready             Semaphore to synchronize starting of streams
      */
-    public ConnectedThread(BluetoothSocket socket, File storageDirectory, String location, int rate, int mode, ReadyCounter ready) {
+    public ConnectedThread(BluetoothSocket socket, File storageDirectory, String location, int rate, int mode,
+                           ReadyCounter ready) {
 
-        this.socket = socket; //Bluetooth socket
-        this.mode = mode;     //Streaming mode
-        this.rate = rate;     //Sampling rate
-        this.ready = ready;   //ready semaphore
+        if (D) Log.d(TAG, "Creating ConnectedThread");
 
-        Calendar c = Calendar.getInstance();
+        this.socket = socket;                           //Bluetooth socket
+        this.mode = mode;                               //Streaming mode
+        this.rate = rate;                               //Sampling rate
+        this.ready = ready;                             //ready semaphore
 
+        Calendar c = Calendar.getInstance();            //New calendar instance to create date/time
+
+        //Remove spaces from location name for filenaming.
         location = location.replaceAll("\\s+", "");
 
+        //Set file extension depending on mode
         String fType;
-
         if (mode == 0 || mode == 128) {
             fType = ".csv";
         } else {
             fType = "";
 
         }
+
+        //Month zero indexed in calendar class, increment for readability.
         int month = c.get(Calendar.MONTH);
         month++;
 
+        //Create file to be written to for logging device data. Filename format: "log_LOCATION_DATE_TIME"
         File file = new File(storageDirectory + "/log_" + location + "_" + c.get(Calendar.DATE) + "_" + month +
                 "_" + c.get(Calendar.YEAR) + "_" + c.get(Calendar.HOUR_OF_DAY) + "_" + c.get(Calendar.MINUTE) + fType);
 
-        writerThread1 = new Writer(file, bigBuffer, sizes, finished);
+        //Instantiate thread to write to file concurrently
+        writerThread = new Writer(file, bigBuffer, sizes);
 
-        if (D) Log.d(TAG, "Creating ConnectedThread");
-
+        //Instantiate input and output streams.
         try {
             inStream = new BufferedInputStream(socket.getInputStream(), 2096);
-
             outStream = socket.getOutputStream();
 
         } catch (IOException e) {
-
             Log.e(TAG, "Couldn't construct thread: " + e.getMessage());
         }
 
     }
 
-
+    /**
+     * Sends the set rate command to the device
+     * @param rate Rate of operation for device (Hz)
+     */
     public void setRate(int rate) {
         try {
             outStream.write(("rate x " + rate + "\r\n\r\n").getBytes());
@@ -84,8 +92,13 @@ public class ConnectedThread implements Runnable {
         }
     }
 
+    /**
+     * Sends the set mode command to the device
+     * @param mode Mode of operation for device: 0/128 = ASCII, 1/129 = Binary
+     */
     public void setDataMode(int mode) {
 
+        //If mode is not one acceptable, set to 0
         if (!(mode == 0 || mode == 128 || mode == 1 || mode == 129)) {
             mode = 0;
         }
@@ -97,6 +110,9 @@ public class ConnectedThread implements Runnable {
         }
     }
 
+    /**
+     * Sends the stream command to the device.
+     */
     public void startStream() {
         try {
             outStream.write("STREAM=1\r\n".getBytes());
@@ -106,6 +122,9 @@ public class ConnectedThread implements Runnable {
 
     }
 
+    /**
+     * Sends the stop stream command to the device.
+     */
     public void stopStream() {
 
         //TODO make sure time to finish
@@ -115,63 +134,85 @@ public class ConnectedThread implements Runnable {
         } catch (IOException e) {
             Log.e(TAG, "Error writing to device: " + e.getMessage());
         }
+
+        //TODO Semaphore for close;
+
         try {
-            if(finished)
                 socket.close();
         } catch (IOException e) {
             Log.e(TAG, "Failed to close Socket: " + e.getMessage());
         }
+
+        //Stop the run loop.
         running = false;
-        writerThread1.shutdown();
+
+        //Shutdown the Writer thread
+        writerThread.shutdown();
 
     }
 
     @Override
     public void run() {
-        int bytes = 0;
-        writerThread1.start();
 
+        int bytes = 0; //Holds the number of bytes read
+
+
+        //Start the writer thread.
+        writerThread.start();
+
+        //Sleeps are inserted to allow time for device to process commands
         try {
-            Thread.sleep(100);
-            Thread.sleep(100);
+            //Set recording rate
             setRate(rate);
+
+            //Set mode of recording
             Thread.sleep(100);
             setDataMode(mode);
-            Thread.sleep(100);
 
+            //Tell other threads ready to start.
+            Thread.sleep(100);
             ready.decrement();
+
+            //Wait for all devices to be ready.
             while (ready.getValue() != 0) {
                 Thread.sleep(100);
             }
+
+            //Send the start stream command.
             startStream();
 
-            //Thread.sleep(1000);
         } catch (InterruptedException e) {
             Log.e(TAG, "Sleep Interrupted");
         }
 
+        //Until told to stop
         while (running) {
 
+            //Create buffer to hold read bytes
             byte[] buffer = new byte[1024];
 
+            //Read from device
             try {
                 bytes = inStream.read(buffer);
             } catch (IOException e) {
                 Log.e(TAG, "Failed to read: " + e.getMessage(), e);
             }
 
-            synchronized (writerThread1) {
+
+            synchronized (writerThread) {
+                //While data is available to be written
                 if (bytes > 0) {
+                    //add to the linked list.
                     bigBuffer.add(buffer);
                     sizes.add(bytes);
-                    writerThread1.notify();
+                    //let the writer thread know there is data to write.
+                    writerThread.notify();
                 }
             }
         }
 
-
+        //Once finished running close all streams
         try {
-            outStream.flush();
             outStream.close();
             inStream.close();
         } catch (IOException e) {
