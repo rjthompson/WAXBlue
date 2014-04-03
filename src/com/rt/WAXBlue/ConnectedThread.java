@@ -85,6 +85,9 @@ public class ConnectedThread implements Runnable {
      * @param rate Rate of operation for device (Hz)
      */
     public void setRate(int rate) {
+
+        if(D) Log.d(TAG, "Setting rate to: " + rate);
+
         try {
             outStream.write(("rate x " + rate + "\r\n\r\n").getBytes());
         } catch (IOException e) {
@@ -97,6 +100,8 @@ public class ConnectedThread implements Runnable {
      * @param mode Mode of operation for device: 0/128 = ASCII, 1/129 = Binary
      */
     public void setDataMode(int mode) {
+
+        if(D) Log.d(TAG, "Setting mode to: " + mode);
 
         //If mode is not one acceptable, set to 0
         if (!(mode == 0 || mode == 128 || mode == 1 || mode == 129)) {
@@ -114,6 +119,9 @@ public class ConnectedThread implements Runnable {
      * Sends the stream command to the device.
      */
     public void startStream() {
+
+        if(D) Log.d(TAG, "Starting stream");
+
         try {
             outStream.write("STREAM=1\r\n".getBytes());
         } catch (IOException e) {
@@ -127,6 +135,7 @@ public class ConnectedThread implements Runnable {
      */
     public void stopStream() {
 
+        if(D) Log.d(TAG, "Stopping stream");
         //TODO make sure time to finish
 
         try {
@@ -153,6 +162,7 @@ public class ConnectedThread implements Runnable {
 
     @Override
     public void run() {
+        if(D) Log.d(TAG, "Running Thread");
 
         int bytes = 0; //Holds the number of bytes read
 
