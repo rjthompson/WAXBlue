@@ -27,7 +27,7 @@ public class MainActivity extends Activity {
 
     private static final String TAG = "Main Activity";          //Debugging tag
     private static final boolean D = true;                      //Flag to turn on or off debug logging
-
+    private static final int REQUEST_ENABLE_BT = 1;             //Int to allow for BT enabling request
     private BluetoothConnector bluetoothConnector;              //Connector to set up and manage threads for BT devices
     private ListView pairedDeviceListView;                      //View to display devices that are paired with phone
     private GridView locationsGridView;                         //GridView to display the locations at which the devices will be attached
@@ -46,9 +46,7 @@ public class MainActivity extends Activity {
     private int selectedItem = -1;                              //Int representing which location has been selected
     private boolean locked = false;                             //Flag to indicate status of buttons
     private boolean selected = false;                           //Flag to indicate if any location is currently selected
-    private static final int REQUEST_ENABLE_BT = 1;             //Int to allow for BT enabling request
     private int mode = 128;                                     //Output mode
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +59,7 @@ public class MainActivity extends Activity {
     /**
      * Initialise Activity variables
      */
-    private void init(){
+    private void init() {
 
 
         pairedDeviceListView = (ListView) this.findViewById(R.id.deviceListView);
@@ -115,8 +113,9 @@ public class MainActivity extends Activity {
                             found = true;
                         }
                     }
-                    if(D)Log.d(TAG, "Location: " + locations[selectedItem] + ", i: " + i+", Device: "+pairedDevicesList
-                            .get(i));
+                    if (D)
+                        Log.d(TAG, "Location: " + locations[selectedItem] + ", i: " + i + ", Device: " + pairedDevicesList
+                                .get(i));
 
                     //Remove the added device from the list of devices being displayed, device still exists
                     //in pairedDevicesSet
@@ -130,10 +129,10 @@ public class MainActivity extends Activity {
             }
         });
 
-        if(!isExternalStorageWritable()){
+        if (!isExternalStorageWritable()) {
             displayToast("Cannot Write to External Storage :(");
             finish();
-        }else{
+        } else {
             if (!createDirectoryForStorage()) {
                 displayToast("Cannot Log Data");
                 finish();
@@ -149,12 +148,12 @@ public class MainActivity extends Activity {
         locationsGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if(!locked){
-                    if(!selected){
+                if (!locked) {
+                    if (!selected) {
                         selectItem(view, i);
-                    }else if(selectedItem == i){
+                    } else if (selectedItem == i) {
                         deselectItem(view);
-                    }else{
+                    } else {
                         //deselect current item
                         View preView = locationsGridView.getChildAt(selectedItem);
                         deselectItem(preView);
@@ -167,31 +166,46 @@ public class MainActivity extends Activity {
         });
 
 
-
     }
 
+    /**
+     * If directory does not exist, make it
+     * @return true if successful
+     */
     private boolean createDirectoryForStorage() {
-
-        storageDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString()+"/Data/");
+        //Default storage location is a directory called Data in downloads. Documents kept fucking around so wasn't used.
+        storageDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/Data/");
         return storageDirectory.exists() || storageDirectory.mkdirs();
     }
 
-
-    private void deselectItem(View view){
+    /**
+     * Deselects a highlighted location
+     * @param view clicked view element
+     */
+    private void deselectItem(View view) {
+        //Unhighlight
         view.setBackgroundResource(R.drawable.grid_background_default);
+        //Indicate no location is selected anymore
         selected = false;
         selectedItem = -1;
     }
 
-    private void selectItem(View view, int item){
+    /**
+     * Highlights clicked location and indicates that it has been selected
+     * @param view View element that was selected
+     * @param item item that has been selected
+     */
+    private void selectItem(View view, int item) {
         view.setBackgroundResource(R.drawable.grid_background_highlighted);
-        if(!selected){
+        if (!selected) {
             selectedItem = item;
             selected = true;
         }
     }
+
     /**
      * Checks that bluetooth is supported, enabled and that there are devices paired.
+     *
      * @return true if bluetooth connection successful
      */
     private boolean checkBluetooth() {
@@ -205,7 +219,7 @@ public class MainActivity extends Activity {
             finish();
         }
 
-        // Check if enabled
+        // Check if enabled, if not request to enable it.
         if (!(mBluetoothAdapter != null && mBluetoothAdapter.isEnabled())) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
@@ -225,7 +239,7 @@ public class MainActivity extends Activity {
     /**
      * Populates just the paired devices list from the set.
      */
-    private void populatePairedDevices(){
+    private void populatePairedDevices() {
         //Populate Array Adapter with devices for display in list view
 
         if (pairedDevicesSet.size() > 0) {
@@ -235,7 +249,11 @@ public class MainActivity extends Activity {
         }
     }
 
-    public void clearClick(View v){
+    /**
+     * Clears all bindings and resets all lists.
+     * @param v View element that was clicked. Only for OS functionality
+     */
+    public void clearClick(View v) {
 
         //Clear old paired devices list
         pairedDevicesList.clear();
@@ -253,49 +271,73 @@ public class MainActivity extends Activity {
         //Clear added devices list
         addedDevicesList.clear();
         //Deselect any location that might currently be selected
-        if(selectedItem != -1){
+        if (selectedItem != -1) {
             View selView = locationsGridView.getChildAt(selectedItem);
             deselectItem(selView);
         }
         //TODO more clear code
     }
 
-    public void clearSelectedClick(View v){
-        if(!selected){
+    /**
+     * Clears selected location/device binding and repopulates lists.
+     * @param v View element that was clicked. Only for OS functionality
+     */
+    public void clearSelectedClick(View v) {
+
+        //Check to make sure something has been selected at least
+        if (!selected) {
             displayToast("Nothing to Clear");
-        }else{
-            TextView t = (TextView)locationsGridView.getChildAt(selectedItem);
+        }
+        //Check to make sure selected item has been previously set
+        else if (!usedLocations.contains(selectedItem)) {
+            displayToast("Nothing to Clear");
+        } else {
+            //Get the view to be deselected
+            TextView t = (TextView) locationsGridView.getChildAt(selectedItem);
+            //Iterate through added devices list to find the device to be cleared
             String deviceName = null;
             DeviceToBeAdded[] itList = addedDevicesList.toArray(new DeviceToBeAdded[0]);
-            for(DeviceToBeAdded d : itList){
-                String s = (String)t.getText();
-                if(s.contains(d.getDeviceName())){
+            for (DeviceToBeAdded d : itList) {
+                //get the text of the location/device pairing
+                String s = (String) t.getText();
+
+                //if the pairing contains the name of the currently inspected device, remove from added devices,
+                //add back into paired devices list for reselection
+                if (s.contains(d.getDeviceName())) {
                     deviceName = d.getDeviceName();
                     pairedDevicesList.add(d.getDeviceName());
                     addedDevicesList.remove(d);
                 }
             }
-            for(int i = 0; i< locationsList.size(); i++){
+            //Rename the location to no-longer include the device name
+            for (int i = 0; i < locationsList.size(); i++) {
                 String s = locationsList.get(i);
-                if(s.contains(deviceName) && deviceName != null){
+                if (s.contains(deviceName) && deviceName != null) {
                     locationsList.set(i, locations[selectedItem]);
                 }
             }
-            usedLocations.remove((Integer)selectedItem);
+            //Release the location for reuse
+            usedLocations.remove((Integer) selectedItem);
+            //deselect the location
             deselectItem(t);
+            //notify the display
             deviceDisplayArrayAdapter.notifyDataSetChanged();
             locationDisplayArrayAdapter.notifyDataSetChanged();
         }
     }
 
-    public void finishClick(View v){
-
+    /**
+     * Requests confirmation of location/device bindings and continues to next phase if successful.
+     * @param v
+     */
+    public void finishClick(View v) {
+        //Create confirmation dialogue
         new AlertDialog.Builder(this)
                 .setTitle("Finish")
                 .setMessage("Are you sure you want to accept this pairing?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which){
+                    public void onClick(DialogInterface dialog, int which) {
                         prepForConnection();
                     }
                 })
@@ -303,6 +345,10 @@ public class MainActivity extends Activity {
                 .show();
     }
 
+    /**
+     * Set the functionality associated with selecting a mode for the devices.
+     * @param view View element that was clicked
+     */
     public void onRadioButtonClicked(View view) {
         // Is the button now checked?
         boolean checked = ((RadioButton) view).isChecked();
@@ -321,7 +367,7 @@ public class MainActivity extends Activity {
                 if (checked)
                     mode = 1;
                 break;
-           /* case R.id.binLong:
+           /* case R.id.binLong:                                       //Mode 129 not working atm :/
                 if (checked)
                     mode = 129;
                 break;         */
@@ -331,77 +377,109 @@ public class MainActivity extends Activity {
         }
     }
 
-
     /**
      * Initiate Bluetooth connection
      *
-     * @param v View
+     * @param v View element that was clicked
      */
     public void connectClick(View v) {
 
-        int rate;
         //get rate from text input box
+        int rate;
         EditText rateEntry = (EditText) findViewById(R.id.rateEntry);
         String rateText = rateEntry.getText().toString();
-        if(!rateText.equals("")){
+        //If rate is unset, default to 50Hz
+        if (!rateText.equals("")) {
             rate = parseInt(rateText);
-        }else{
+        } else {
             rate = 50;
         }
 
         //ensure mode has been set
-        if(mode!=-1){
+        if (mode != -1) {
             //Get number of devices and initialise connection
             bluetoothConnector = new BluetoothConnector(addedDevicesList, storageDirectory, rate, mode);
-        }else{
+        } else {
             displayToast("Please select an output mode");
         }
 
     }
 
-
+    /**
+     * Start the streams!!
+     * @param v Button that was clicked. Only used for OS functionality
+     */
     public void streamClick(View v) {
         if (D) Log.d(TAG, "Starting Stream");
         bluetoothConnector.runThreads();
     }
 
+    /**
+     * Stop the streams!!
+     * @param v Button that was clicked. Only used for OS functionality
+     */
     public void stopClick(View v) {
         //TODO fix crash
         bluetoothConnector.stopThreads();
     }
 
+    /**
+     * Changes the current display from set up to initiation mode. Should probably be a completely different Intent and
+     * given time, will be in the future
+     */
     private void prepForConnection() {
+
         //Remove the paired devices list
         ((RelativeLayout) pairedDeviceListView.getParent()).removeView(pairedDeviceListView);
 
+        //Hide the setup buttons
         hideSetupButtons();
+        //Lock in the location/device bindings
         lockLocations();
+        //Reveal the initiation buttons.
         showConnectionButtons();
 
     }
 
+    /**
+     * Hide the setup buttons in preparation for initiation phase
+     */
+    private void hideSetupButtons() {
+        findViewById(R.id.clearButton).setVisibility(View.INVISIBLE);
+        findViewById(R.id.clearSelectedButton).setVisibility(View.INVISIBLE);
+        findViewById(R.id.finishButton).setVisibility(View.INVISIBLE);
+    }
+
+    /**
+     * Disable editing of location/device bindings
+     */
+    private void lockLocations() {
+        //Loop through all locations
+        for (int i = 0; i < locations.length; i++) {
+            //Set background colour to dark blue to show that it's locked in
+            TextView locView = (TextView) locationsGridView.getChildAt(i);
+            locView.setBackgroundResource(R.drawable.grid_background_locked);
+            //Text colour to white
+            locView.setTextColor(Color.WHITE);
+            //Let everyone know it's locked
+            locked = true;
+        }
+    }
+
+    /**
+     * Reveal the initiation buttons, should not be called without #hideSetupButtons()
+     */
     private void showConnectionButtons() {
         findViewById(R.id.connectButtonGroup).setVisibility(View.VISIBLE);
         findViewById(R.id.rateGroup).setVisibility(View.VISIBLE);
         findViewById(R.id.modeGroup).setVisibility(View.VISIBLE);
     }
 
-    private void lockLocations(){
-        for (int i = 0; i < locations.length; i++) {
-            TextView locView = (TextView) locationsGridView.getChildAt(i);
-            locView.setBackgroundResource(R.drawable.grid_background_locked);
-            locView.setTextColor(Color.WHITE);
-            locked = true;
-        }
-    }
-
-    private void hideSetupButtons(){
-        findViewById(R.id.clearButton).setVisibility(View.INVISIBLE);
-        findViewById(R.id.clearSelectedButton).setVisibility(View.INVISIBLE);
-        findViewById(R.id.finishButton).setVisibility(View.INVISIBLE);
-    }
-
-
+    /**
+     * Menu button, currently no functionality.
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -411,14 +489,17 @@ public class MainActivity extends Activity {
 
     /**
      * Display string as toast
+     *
      * @param s String toast text
      */
-    public void displayToast(String s) {
+    private void displayToast(String s) {
         Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
     }
 
-    /* Checks if external storage is available for read and write */
-    public boolean isExternalStorageWritable() {
+    /**
+     * Checks if external storage is available for read and write
+     */
+    private boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
         return Environment.MEDIA_MOUNTED.equals(state);
     }
