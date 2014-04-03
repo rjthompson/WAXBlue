@@ -1,18 +1,20 @@
 package com.rt.WAXBlue;
 
 import android.bluetooth.BluetoothDevice;
-import android.content.Context;
 import android.util.Log;
-
 import java.io.File;
 import java.util.List;
 
+/**
+ * Class to handle and coordinate multiple device connections
+ */
 public class BluetoothConnector{
-    private DeviceConnection[] connections;
 
-    private static final String TAG = "Bluetooth Connector";
-    private static final boolean D = true;
-    private ReadyCounter ready;
+    private static final String TAG = "Bluetooth Connector";   //Logging tag
+    private static final boolean D = true;                     //Logging flag
+
+    private DeviceConnection[] connections;                    //Array of all connections to be made
+    private ReadyCounter ready;                                //Semaphore to signal devices are ready to stream
 
 
     /**
@@ -24,44 +26,52 @@ public class BluetoothConnector{
      */
     public BluetoothConnector(List<DeviceToBeAdded> devices, File storageDirectory, int rate, int mode) {
 
-        // Initialised later
         if(D) Log.d(TAG, "Devices: " + devices.toString());
+
+        //Initialise ready semaphore
         ready = new ReadyCounter(devices.size());
 
+        //Initialise connections array
         connections = new DeviceConnection[devices.size()];
 
-        try {
+        //Counter for Connection IDs
+        int counter = 0;
 
+        //Loop through all devices to be connected to
+        for(DeviceToBeAdded d : devices){
 
-            //Counter for Connection IDs
-            int counter = 0;
+            BluetoothDevice device = d.getDevice();
 
-            for(DeviceToBeAdded d : devices){
+            if (D) Log.d(TAG, "Attempting to create new Device Connection with " + device.getName() + " on " + d.getLocation());
 
-                BluetoothDevice device = d.getDevice();
+            //Create a new connection and add it to the array.
+            connections[counter] = new DeviceConnection(device, counter, storageDirectory, d.getLocation(), rate, mode, ready);
 
-                if (D) Log.d(TAG, "Attempting to create new Device Connection with " + device.getName() + " on " + d.getLocation());
+            if (D) Log.d(TAG, "New Device Connections Created Successfully");
 
-                connections[counter] = new DeviceConnection(device, counter, storageDirectory, d.getLocation(), rate, mode, ready);
-                if (D) Log.d(TAG, "New Device Connections Created Successfully");
-                counter++;
-
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+            counter++;
         }
+
+
     }
 
+    /**
+     * Initialise all connections
+     */
     public void runThreads(){
 
         if(D) Log.d(TAG, "Initialising connections");
+
         for (DeviceConnection connection : connections) {
             connection.init();
         }
     }
 
+    /**
+     * Stop streams on all connections    TODO change to semamphore!
+     */
     public void stopThreads(){
+
         for (DeviceConnection connection : connections) {
             connection.stopStream();
         }
