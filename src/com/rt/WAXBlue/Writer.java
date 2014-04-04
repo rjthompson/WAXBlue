@@ -50,11 +50,11 @@ public class Writer extends Thread {
 
         if (D) Log.d(TAG, "Running Writer Thread");
 
-        try {
-            allDone.acquire();
-        } catch (InterruptedException e) {
-            Log.e(TAG, "Failed to acquire semaphore");
-        }
+//        try {
+//            allDone.acquire();
+//        } catch (InterruptedException e) {
+//            Log.e(TAG, "Failed to acquire semaphore");
+//        }
         //Write timestamp to data.
         long time = System.currentTimeMillis();
         try {
@@ -122,7 +122,7 @@ public class Writer extends Thread {
             Log.e(TAG, "Failed to closed file output stream", e);
         }
 
-        allDone.release();
+        //allDone.release();
     }
 
     /**
@@ -130,7 +130,7 @@ public class Writer extends Thread {
      */
     public synchronized void shutdown() {
 
-        if (D) Log.d(TAG, "Stopping Writer Thread");
+        if (D) Log.d(TAG, "Stopping Writer Thread: " + getName());
 
         //stop run loop
         isRunning = false;

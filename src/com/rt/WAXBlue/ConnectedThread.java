@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Calendar;
 import java.util.LinkedList;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Semaphore;
 
 public class ConnectedThread implements Runnable {
@@ -24,8 +26,8 @@ public class ConnectedThread implements Runnable {
     private volatile LinkedList<byte[]> bigBuffer = new LinkedList<byte[]>(); //Buffer to contain byte[] with data
     private volatile LinkedList<Integer> sizes = new LinkedList<Integer>();   //Buffer to contain sizes of byte[]s
     private volatile boolean running = true;                                  //Flag for run loop
-    private Semaphore ready;                                               //Semaphore to synchronize streaming
-    private Semaphore writerDone;                                                //Semaphore to signal that writer thread has finished
+    private CyclicBarrier ready;                                              //Semaphore to synchronize streaming
+    private final Semaphore writerDone;                                       //Semaphore to signal that writer thread has finished
     /**
      *
      * @param socket            Bluetooth socket to device
@@ -36,7 +38,7 @@ public class ConnectedThread implements Runnable {
      * @param ready             Semaphore to synchronize starting of streams
      */
     public ConnectedThread(BluetoothSocket socket, File storageDirectory, String location, int rate, int mode,
-                           Semaphore ready) {
+                           CyclicBarrier ready) {
 
         if (D) Log.d(TAG, "Creating ConnectedThread");
 
@@ -160,12 +162,6 @@ public class ConnectedThread implements Runnable {
             Log.e(TAG, "Interrupted whilst acquiring writer's semaphore");
         }
 
-        //Close the bluetooth connection.
-        try {
-            socket.close();
-        } catch (IOException e) {
-            Log.e(TAG, "Failed to close Socket: " + e.getMessage());
-        }
     }
 
     @Override
@@ -174,13 +170,11 @@ public class ConnectedThread implements Runnable {
 
         int bytes = 0; //Holds the number of bytes read
 
-
         //Start the writer thread.
         writerThread.start();
 
         //Sleeps are inserted to allow time for device to process commands
         try {
-            ready.acquire();
             //Set recording rate
             setRate(rate);
 
@@ -189,10 +183,13 @@ public class ConnectedThread implements Runnable {
             setDataMode(mode);
 
             //Wait for all devices to be ready.
-            if(ready.availablePermits()==0){
-                //Send the start stream command.
-                startStream();
+            try {
+                ready.await();
+            } catch (BrokenBarrierException e) {
+                Log.e(TAG, "BARRIER BEEN BUSTED!");
             }
+            //Send the start stream command.
+            startStream();
 
         } catch (InterruptedException e) {
             Log.e(TAG, "Sleep Interrupted");
@@ -231,8 +228,13 @@ public class ConnectedThread implements Runnable {
         } catch (IOException e) {
             Log.e(TAG, "Error closing streams");
         }
-        ready.release();
 
+        //Close the bluetooth connection.
+        try {
+            socket.close();
+        } catch (IOException e) {
+            Log.e(TAG, "Failed to close Socket: " + e.getMessage());
+        }
 
     }
 

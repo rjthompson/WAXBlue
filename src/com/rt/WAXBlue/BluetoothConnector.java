@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothDevice;
 import android.util.Log;
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -15,7 +16,7 @@ public class BluetoothConnector{
     private static final boolean D = true;                     //Logging flag
 
     private DeviceConnection[] connections;                    //Array of all connections to be made
-    private Semaphore ready;                                //Semaphore to signal devices are ready to stream
+    private CyclicBarrier ready;                               //Barrier to signal devices are ready to stream
 
 
     /**
@@ -30,7 +31,7 @@ public class BluetoothConnector{
         if(D) Log.d(TAG, "Devices: " + devices.toString());
 
         //Initialise ready semaphore
-        ready = new Semaphore(devices.size());
+        ready = new CyclicBarrier(devices.size());
 
         //Initialise connections array
         connections = new DeviceConnection[devices.size()];

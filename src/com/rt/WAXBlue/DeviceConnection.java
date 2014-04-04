@@ -7,6 +7,7 @@ import android.util.Log;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -29,7 +30,7 @@ public class DeviceConnection{
     private String location;                    //Location at which the device will be attached
     private final int rate;                     //Rate at which the device should stream
     private int mode;                           //Mode of streaming for device
-    private Semaphore ready;                 //Semaphore to indicate that all devices are ready to start streaming
+    private CyclicBarrier ready;                 //Semaphore to indicate that all devices are ready to start streaming
 
     /**
      *
@@ -42,7 +43,7 @@ public class DeviceConnection{
      * @param ready             Semaphore to indicate device is ready to stream
      */
     public DeviceConnection(BluetoothDevice waxDevice, final int id, File storageDirectory, String location, int rate,
-                            int mode, Semaphore ready) {
+                            int mode, CyclicBarrier ready) {
 
         if (D) Log.d(TAG, "Constructing device connection on: " + waxDevice.getName() + " ID: "+id);
 
