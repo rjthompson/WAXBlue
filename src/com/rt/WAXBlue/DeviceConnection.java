@@ -7,6 +7,7 @@ import android.util.Log;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
+import java.util.concurrent.Semaphore;
 
 /**
  * Attempt a new Bluetooth connection on a new thread
@@ -22,14 +23,13 @@ public class DeviceConnection{
 
     private BluetoothDevice waxDevice;          //The device to connect to
     private BluetoothSocket mSocket;            //The devices Bluetooth socket
-    private Thread mConnected;                  //A thread to handle the connection once established
     private ConnectedThread connection;         //Runnable implementation for the connection
 
     private File storageDirectory;              //Directory to store log files
     private String location;                    //Location at which the device will be attached
     private final int rate;                     //Rate at which the device should stream
     private int mode;                           //Mode of streaming for device
-    private ReadyCounter ready;                 //Semaphore to indicate that all devices are ready to start streaming
+    private Semaphore ready;                 //Semaphore to indicate that all devices are ready to start streaming
 
     /**
      *
@@ -42,7 +42,7 @@ public class DeviceConnection{
      * @param ready             Semaphore to indicate device is ready to stream
      */
     public DeviceConnection(BluetoothDevice waxDevice, final int id, File storageDirectory, String location, int rate,
-                            int mode, ReadyCounter ready) {
+                            int mode, Semaphore ready) {
 
         if (D) Log.d(TAG, "Constructing device connection on: " + waxDevice.getName() + " ID: "+id);
 
@@ -76,6 +76,7 @@ public class DeviceConnection{
         try {
             mSocket.connect();
         } catch (IOException e) {
+            //TODO Fail here. Return to some place better
             Log.e(TAG, "Error Connecting to Socket on "+waxDevice.getName() +": "+ e.getMessage());
             try {
                 mSocket.close();
@@ -88,7 +89,7 @@ public class DeviceConnection{
         //Create connection runnable
         connection = new ConnectedThread(mSocket, storageDirectory, location, rate, mode, ready);
         //Create thread using connection runnable
-        mConnected = new Thread(connection);
+        Thread mConnected = new Thread(connection);
         mConnected.start();
 
 
@@ -105,14 +106,6 @@ public class DeviceConnection{
             connection.stopStream();
         }
 
-        //Hold until the connection thread has finished. TODO Check!!
-        if(mConnected!=null) if (mConnected.isAlive()) {
-            try {
-                mConnected.join();
-            } catch (InterruptedException e) {
-                Log.e(TAG, "Interrupted whilst waiting for mConnected to terminate.");
-            }
-        }
     }
 
 }

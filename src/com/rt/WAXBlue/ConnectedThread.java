@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Calendar;
 import java.util.LinkedList;
+import java.util.concurrent.Semaphore;
 
 public class ConnectedThread implements Runnable {
 
@@ -23,8 +24,8 @@ public class ConnectedThread implements Runnable {
     private volatile LinkedList<byte[]> bigBuffer = new LinkedList<byte[]>(); //Buffer to contain byte[] with data
     private volatile LinkedList<Integer> sizes = new LinkedList<Integer>();   //Buffer to contain sizes of byte[]s
     private volatile boolean running = true;                                  //Flag for run loop
-    private ReadyCounter ready;                                               //Semaphore to synchronize streaming
-
+    private Semaphore ready;                                               //Semaphore to synchronize streaming
+    private Semaphore writerDone;                                                //Semaphore to signal that writer thread has finished
     /**
      *
      * @param socket            Bluetooth socket to device
@@ -35,7 +36,7 @@ public class ConnectedThread implements Runnable {
      * @param ready             Semaphore to synchronize starting of streams
      */
     public ConnectedThread(BluetoothSocket socket, File storageDirectory, String location, int rate, int mode,
-                           ReadyCounter ready) {
+                           Semaphore ready) {
 
         if (D) Log.d(TAG, "Creating ConnectedThread");
 
@@ -43,10 +44,12 @@ public class ConnectedThread implements Runnable {
         this.mode = mode;                               //Streaming mode
         this.rate = rate;                               //Sampling rate
         this.ready = ready;                             //ready semaphore
+        this.writerDone = new Semaphore(1);
+
 
         Calendar c = Calendar.getInstance();            //New calendar instance to create date/time
 
-        //Remove spaces from location name for filenaming.
+        //Remove spaces from location name for file naming.
         location = location.replaceAll("\\s+", "");
 
         //Set file extension depending on mode
@@ -67,7 +70,7 @@ public class ConnectedThread implements Runnable {
                 "_" + c.get(Calendar.YEAR) + "_" + c.get(Calendar.HOUR_OF_DAY) + "_" + c.get(Calendar.MINUTE) + fType);
 
         //Instantiate thread to write to file concurrently
-        writerThread = new Writer(file, bigBuffer, sizes);
+        writerThread = new Writer(file, bigBuffer, sizes, writerDone);
 
         //Instantiate input and output streams.
         try {
@@ -145,19 +148,24 @@ public class ConnectedThread implements Runnable {
         }
 
         //TODO Semaphore for close;
-
-        try {
-                socket.close();
-        } catch (IOException e) {
-            Log.e(TAG, "Failed to close Socket: " + e.getMessage());
-        }
-
         //Stop the run loop.
         running = false;
 
         //Shutdown the Writer thread
         writerThread.shutdown();
 
+        try {
+            writerDone.acquire();
+        } catch (InterruptedException e) {
+            Log.e(TAG, "Interrupted whilst acquiring writer's semaphore");
+        }
+
+        //Close the bluetooth connection.
+        try {
+            socket.close();
+        } catch (IOException e) {
+            Log.e(TAG, "Failed to close Socket: " + e.getMessage());
+        }
     }
 
     @Override
@@ -172,6 +180,7 @@ public class ConnectedThread implements Runnable {
 
         //Sleeps are inserted to allow time for device to process commands
         try {
+            ready.acquire();
             //Set recording rate
             setRate(rate);
 
@@ -179,17 +188,11 @@ public class ConnectedThread implements Runnable {
             Thread.sleep(100);
             setDataMode(mode);
 
-            //Tell other threads ready to start.
-            Thread.sleep(100);
-            ready.decrement();
-
             //Wait for all devices to be ready.
-            while (ready.getValue() != 0) {
-                Thread.sleep(100);
+            if(ready.availablePermits()==0){
+                //Send the start stream command.
+                startStream();
             }
-
-            //Send the start stream command.
-            startStream();
 
         } catch (InterruptedException e) {
             Log.e(TAG, "Sleep Interrupted");
@@ -228,6 +231,7 @@ public class ConnectedThread implements Runnable {
         } catch (IOException e) {
             Log.e(TAG, "Error closing streams");
         }
+        ready.release();
 
 
     }

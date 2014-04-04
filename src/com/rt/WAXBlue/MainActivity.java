@@ -419,7 +419,6 @@ public class MainActivity extends Activity {
      * @param v Button that was clicked. Only used for OS functionality
      */
     public void stopClick(View v) {
-        //TODO fix crash
         bluetoothConnector.stopThreads();
     }
 

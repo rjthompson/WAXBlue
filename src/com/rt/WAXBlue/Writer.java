@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.concurrent.Semaphore;
 
 /**
  * Author: Rob Thompson
@@ -20,13 +21,14 @@ public class Writer extends Thread {
     private volatile LinkedList<byte[]> bigBuffer;         //Linked list containing byte[] buffers with data from device
     private volatile LinkedList<Integer> sizes;            //Linked list containing sizes of byte[] buffers
     private boolean isRunning = true;                      //Flag to keep run loop going.
+    private Semaphore allDone = null;                       //Flag to indicate everything in this thread has finished and it is safe to close down
     /**
      *
      * @param file      File to write to.
      * @param bigBuffer Linked list containing byte[] buffers with data from device
      * @param sizes     Linked list containing sizes of byte[] buffers
      */
-    public Writer(File file, LinkedList<byte[]> bigBuffer, LinkedList<Integer> sizes) {
+    public Writer(File file, LinkedList<byte[]> bigBuffer, LinkedList<Integer> sizes, Semaphore allDone) {
 
         if(D) Log.d(TAG, "Creating new Writer Thread");
 
@@ -40,6 +42,7 @@ public class Writer extends Thread {
 
         this.bigBuffer = bigBuffer;                            //Linked list containing data to be written
         this.sizes = sizes;                                    //Linked list containing size information about data.
+        this.allDone = allDone;                                //Semaphore indicate that this thread is all finished
     }
 
     @Override
@@ -47,6 +50,11 @@ public class Writer extends Thread {
 
         if (D) Log.d(TAG, "Running Writer Thread");
 
+        try {
+            allDone.acquire();
+        } catch (InterruptedException e) {
+            Log.e(TAG, "Failed to acquire semaphore");
+        }
         //Write timestamp to data.
         long time = System.currentTimeMillis();
         try {
@@ -61,7 +69,6 @@ public class Writer extends Thread {
             // Wait until we have data
             try {
                 wait();
-
             } catch (InterruptedException ignored) {
             }
 
@@ -114,6 +121,8 @@ public class Writer extends Thread {
         } catch (IOException e) {
             Log.e(TAG, "Failed to closed file output stream", e);
         }
+
+        allDone.release();
     }
 
     /**
