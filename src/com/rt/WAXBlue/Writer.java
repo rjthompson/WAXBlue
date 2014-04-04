@@ -20,7 +20,6 @@ public class Writer extends Thread {
     private volatile LinkedList<byte[]> bigBuffer;         //Linked list containing byte[] buffers with data from device
     private volatile LinkedList<Integer> sizes;            //Linked list containing sizes of byte[] buffers
     private boolean isRunning = true;                      //Flag to keep run loop going.
-
     /**
      *
      * @param file      File to write to.
@@ -108,6 +107,13 @@ public class Writer extends Thread {
         } catch (IOException e) {
             Log.e(TAG, "Write Error", e);
         }
+
+        //close the file output stream
+        try {
+            fos.close();
+        } catch (IOException e) {
+            Log.e(TAG, "Failed to closed file output stream", e);
+        }
     }
 
     /**
@@ -119,20 +125,6 @@ public class Writer extends Thread {
 
         //stop run loop
         isRunning = false;
-
-        //give time for run to finish writing.
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            Log.e(TAG, "Interrupted sleep");
-        }
-
-        //close the file output stream
-        try {
-            fos.close();
-        } catch (IOException e) {
-            Log.e(TAG, "Failed to closed file output stream", e);
-        }
 
     }
 }

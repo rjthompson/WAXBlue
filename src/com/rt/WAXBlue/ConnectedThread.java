@@ -210,7 +210,7 @@ public class ConnectedThread implements Runnable {
 
 
             synchronized (writerThread) {
-                //While data is available to be written
+                //if data is available to be written
                 if (bytes > 0) {
                     //add to the linked list.
                     bigBuffer.add(buffer);
