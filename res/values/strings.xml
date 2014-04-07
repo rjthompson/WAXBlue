@@ -14,4 +14,5 @@
     <string name="mode_text_long">Text\nLong</string>
     <string name="mode_binary">Binary</string>
     <string name="mode_binary_long">Binary\nLong</string>
+    <string name="action_exit">Exit</string>
 </resources>

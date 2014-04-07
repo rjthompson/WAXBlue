@@ -25,7 +25,7 @@ public class DeviceConnection{
     private BluetoothDevice waxDevice;          //The device to connect to
     private BluetoothSocket mSocket;            //The devices Bluetooth socket
     private ConnectedThread connection;         //Runnable implementation for the connection
-
+    private String deviceName;                  //Name of device to which a connection will be established
     private File storageDirectory;              //Directory to store log files
     private String location;                    //Location at which the device will be attached
     private final int rate;                     //Rate at which the device should stream
@@ -53,7 +53,7 @@ public class DeviceConnection{
         this.ready = ready;
         this.storageDirectory = storageDirectory;
         this.location = location;
-
+        this.deviceName = waxDevice.getName();
         mSocket = null;
     }
 
@@ -107,6 +107,22 @@ public class DeviceConnection{
             connection.stopStream();
         }
 
+    }
+
+    /**
+     *
+     * @return Connected device's socket
+     */
+    public BluetoothSocket getmSocket(){
+        return mSocket;
+    }
+
+    /**
+     *
+     * @return Name of the connected device
+     */
+    public String getDeviceName(){
+        return deviceName;
     }
 
 }

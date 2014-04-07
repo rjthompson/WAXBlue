@@ -3,6 +3,7 @@ package com.rt.WAXBlue;
 import android.bluetooth.BluetoothDevice;
 import android.util.Log;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Semaphore;
@@ -70,12 +71,22 @@ public class BluetoothConnector{
     }
 
     /**
-     * Stop streams on all connections    TODO change to semamphore!
+     * Stop streams on all connections    TODO change to semamphore!  (Or maybe don't touch a thing since it's working)
      */
     public void stopThreads(){
 
         for (DeviceConnection connection : connections) {
             connection.stopStream();
+        }
+    }
+
+    private void killConnections(){
+        for(DeviceConnection connection : connections){
+            try {
+                connection.getmSocket().close();
+            } catch (IOException e) {
+                Log.e(TAG, "Failed to Close Socket for "+connection.getDeviceName());
+            }
         }
     }
 }
