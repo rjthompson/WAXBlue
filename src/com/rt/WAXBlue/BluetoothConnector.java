@@ -64,9 +64,34 @@ public class BluetoothConnector{
     public void runThreads(){
 
         if(D) Log.d(TAG, "Initialising connections");
-
+        boolean success = false;
         for (DeviceConnection connection : connections) {
-            connection.init();
+            //Check each connection is successfully started
+            success = connection.init();
+            Log.d(TAG, "Connection for "+connection.getDeviceName()+" "+ (success ? "succeeded" : "failed"));
+            if(!success){
+                break;
+            }
+        }
+        if(!success){
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Log.e(TAG, "Interrupted whilst asleep");
+            }
+            stopThreads();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Log.e(TAG, "Interrupted whilst asleep");
+            }
+            killConnections();
+            //Todo Fail case in here
+        }else{
+            for(DeviceConnection connection : connections){
+                connection.startConnection();
+            }
         }
     }
 
@@ -84,6 +109,7 @@ public class BluetoothConnector{
         for(DeviceConnection connection : connections){
             try {
                 connection.getmSocket().close();
+
             } catch (IOException e) {
                 Log.e(TAG, "Failed to Close Socket for "+connection.getDeviceName());
             }

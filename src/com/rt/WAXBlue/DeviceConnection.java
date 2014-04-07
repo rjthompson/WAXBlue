@@ -18,7 +18,7 @@ import java.util.concurrent.Semaphore;
 public class DeviceConnection{
 
     private static final String TAG = "Device Connection";   //Logging tag
-    private static final boolean D = false;                  //Logging flag
+    private static final boolean D = true;                  //Logging flag
 
     private static final String UUID_STRING = "00001101-0000-1000-8000-00805f9b34fb";     //UUID of device
 
@@ -30,7 +30,8 @@ public class DeviceConnection{
     private String location;                    //Location at which the device will be attached
     private final int rate;                     //Rate at which the device should stream
     private int mode;                           //Mode of streaming for device
-    private CyclicBarrier ready;                 //Semaphore to indicate that all devices are ready to start streaming
+    private CyclicBarrier ready;                //Semaphore to indicate that all devices are ready to start streaming
+    private Thread mConnected;                  //Thread to execute the connection
 
     /**
      *
@@ -59,18 +60,19 @@ public class DeviceConnection{
 
     /**
      * Initialise the connection to the device
+     * @return true if connection successful
      */
-    public void init() {
+    public boolean init() {
         if (D) Log.d(TAG, "Running Device Connection: " + waxDevice.getName());
 
         // Open device's Bluetooth socket
         try {
             if (D) Log.d(TAG, "Opening Socket with " + waxDevice.getName());
-
             mSocket = waxDevice.createRfcommSocketToServiceRecord(UUID.fromString(UUID_STRING));
 
         } catch (IOException e) {
             if (D) Log.e(TAG, "Error opening Socket: "+e.getMessage());
+            return false;
         }
 
         //Establish connection to socket
@@ -83,17 +85,21 @@ public class DeviceConnection{
                 mSocket.close();
             } catch (IOException e2) {
                 Log.e(TAG, "Error closing socket: " + e2.getMessage());
+                return false;
             }
-            return;
+            return false;
         }
 
         //Create connection runnable
         connection = new ConnectedThread(mSocket, storageDirectory, location, rate, mode, ready);
         //Create thread using connection runnable
-        Thread mConnected = new Thread(connection);
+        mConnected = new Thread(connection);
+        return true;
+
+    }
+
+    public void startConnection(){
         mConnected.start();
-
-
     }
 
     /**
