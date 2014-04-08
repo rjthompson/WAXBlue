@@ -399,7 +399,7 @@ public class MainActivity extends Activity {
         //ensure mode has been set
         if (mode != -1) {
             //Get number of devices and initialise connection
-            bluetoothConnector = new BluetoothConnector(addedDevicesList, storageDirectory, rate, mode);
+            bluetoothConnector = new BluetoothConnector(addedDevicesList, storageDirectory, rate, mode, this);
         } else {
             displayToast("Please select an output mode");
         }

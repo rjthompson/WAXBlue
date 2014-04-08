@@ -1,6 +1,7 @@
 package com.rt.WAXBlue;
 
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.util.Log;
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +19,7 @@ public class BluetoothConnector{
 
     private DeviceConnection[] connections;                    //Array of all connections to be made
     private CyclicBarrier ready;                               //Barrier to signal devices are ready to stream
-
+    private Context main;                                      //Context of the main activity
 
     /**
      *
@@ -27,7 +28,7 @@ public class BluetoothConnector{
      * @param rate Sampling rate (Hz)
      * @param mode Output format
      */
-    public BluetoothConnector(List<DeviceToBeAdded> devices, File storageDirectory, int rate, int mode) {
+    public BluetoothConnector(List<DeviceToBeAdded> devices, File storageDirectory, int rate, int mode, Context main) {
 
         if(D) Log.d(TAG, "Devices: " + devices.toString());
 
@@ -70,25 +71,34 @@ public class BluetoothConnector{
             success = connection.init();
             Log.d(TAG, "Connection for "+connection.getDeviceName()+" "+ (success ? "succeeded" : "failed"));
             if(!success){
+
                 break;
             }
         }
+        //If one of the connections fails
         if(!success){
 
+            //todo stop file creation.
+            //Wait a second to allow everything to catch up (time could be reduced)
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 Log.e(TAG, "Interrupted whilst asleep");
             }
+            //Send the stop stream command to all devices to ensure they don't get going.
             stopThreads();
+            //Wait again to give catch up time
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 Log.e(TAG, "Interrupted whilst asleep");
             }
+            //tear everything down.
             killConnections();
             //Todo Fail case in here
+
         }else{
+            //If all connections succeed - go go go!
             for(DeviceConnection connection : connections){
                 connection.startConnection();
             }
@@ -107,11 +117,13 @@ public class BluetoothConnector{
 
     private void killConnections(){
         for(DeviceConnection connection : connections){
-            try {
-                connection.getmSocket().close();
+            if(connection.getmSocket() != null){
+                try {
+                    connection.getmSocket().close();
 
-            } catch (IOException e) {
-                Log.e(TAG, "Failed to Close Socket for "+connection.getDeviceName());
+                } catch (IOException e) {
+                    Log.e(TAG, "Failed to Close Socket for "+connection.getDeviceName());
+                }
             }
         }
     }
