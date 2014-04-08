@@ -7,30 +7,28 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static java.lang.Integer.parseInt;
-
 public class MainActivity extends Activity {
 
     private static final String TAG = "Main Activity";          //Debugging tag
     private static final boolean D = true;                      //Flag to turn on or off debug logging
+
     private static final int REQUEST_ENABLE_BT = 1;             //Int to allow for BT enabling request
-    private BluetoothConnector bluetoothConnector;              //Connector to set up and manage threads for BT devices
-    private ListView pairedDeviceListView;                      //View to display devices that are paired with phone
+    public static final String ADDED_DEVICE_LIST
+            = "com.rt.WAXBlue.addedDeviceList";                 //Name of added devices parcel for connection activity
+    public static final String LOCATIONS_LIST
+            = "com.rt.WAXBlue.locationsList";                   //Name of locationsList parcel for connection intent
     private GridView locationsGridView;                         //GridView to display the locations at which the devices will be attached
     private List<DeviceToBeAdded> addedDevicesList;             //List of devices to be connected to
     private List<String> pairedDevicesList;                     //List of device names paired with phone
@@ -43,11 +41,9 @@ public class MainActivity extends Activity {
     private ArrayList<Integer> usedLocations;                   //Array list to hold indices of locations already assigned
     private ArrayAdapter<String> locationDisplayArrayAdapter;   //Array Adapter for GridView
     private ArrayAdapter<String> deviceDisplayArrayAdapter;     //Paired devices array adapter
-    private File storageDirectory;                              //Directory to store output files
     private int selectedItem = -1;                              //Int representing which location has been selected
     private boolean locked = false;                             //Flag to indicate status of buttons
     private boolean selected = false;                           //Flag to indicate if any location is currently selected
-    private int mode = 128;                                     //Output mode
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +59,7 @@ public class MainActivity extends Activity {
     private void init() {
 
 
-        pairedDeviceListView = (ListView) this.findViewById(R.id.deviceListView);
+        ListView pairedDeviceListView = (ListView) this.findViewById(R.id.deviceListView);
 
         //Initialise Lists
         addedDevicesList = new ArrayList<DeviceToBeAdded>();
@@ -130,16 +126,6 @@ public class MainActivity extends Activity {
             }
         });
 
-        if (!isExternalStorageWritable()) {
-            displayToast("Cannot Write to External Storage :(");
-            finish();
-        } else {
-            if (!createDirectoryForStorage()) {
-                displayToast("Cannot Log Data");
-                finish();
-            }
-        }
-
         locationsGridView = (GridView) findViewById(R.id.locationGridView);
         locationsList = new ArrayList<String>();
         Collections.addAll(locationsList, locations);
@@ -169,15 +155,7 @@ public class MainActivity extends Activity {
 
     }
 
-    /**
-     * If directory does not exist, make it
-     * @return true if successful
-     */
-    private boolean createDirectoryForStorage() {
-        //Default storage location is a directory called Data in downloads. Documents kept fucking around so wasn't used.
-        storageDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/Data/");
-        return storageDirectory.exists() || storageDirectory.mkdirs();
-    }
+
 
     /**
      * Deselects a highlighted location
@@ -332,6 +310,7 @@ public class MainActivity extends Activity {
      * @param v
      */
     public void finishClick(View v) {
+        //todo change to move to next activity
         //Create confirmation dialogue
         new AlertDialog.Builder(this)
                 .setTitle("Finish")
@@ -339,146 +318,26 @@ public class MainActivity extends Activity {
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        prepForConnection();
+                        moveToConnections();
                     }
                 })
                 .setNegativeButton("No", null)
                 .show();
     }
 
-    /**
-     * Set the functionality associated with selecting a mode for the devices.
-     * @param view View element that was clicked
-     */
-    public void onRadioButtonClicked(View view) {
-        // Is the button now checked?
-        boolean checked = ((RadioButton) view).isChecked();
-
-        // Check which radio button was clicked
-        switch (view.getId()) {
-            case R.id.text:
-                if (checked)
-                    mode = 0;
-                break;
-            case R.id.textLong:
-                if (checked)
-                    mode = 128;
-                break;
-            case R.id.binary:
-                if (checked)
-                    mode = 1;
-                break;
-           /* case R.id.binLong:                                       //Mode 129 not working atm :/
-                if (checked)
-                    mode = 129;
-                break;         */
-            default:
-                mode = -1;
-                break;
-        }
+    //todo doc
+    private void moveToConnections(){
+        Intent intent = new Intent(this, ConnectionsActivity.class);
+        intent.putParcelableArrayListExtra(ADDED_DEVICE_LIST, (ArrayList<DeviceToBeAdded>) addedDevicesList);
+        intent.putStringArrayListExtra(LOCATIONS_LIST, locationsList);
+        startActivity(intent);
     }
 
-    /**
-     * Initiate Bluetooth connection   //TODO merge with stream.
-     *
-     * @param v View element that was clicked
-     */
-    public void connectClick(View v) {
-
-        //get rate from text input box
-        int rate;
-        EditText rateEntry = (EditText) findViewById(R.id.rateEntry);
-        String rateText = rateEntry.getText().toString();
-        //If rate is unset, default to 50Hz
-        if (!rateText.equals("")) {
-            rate = parseInt(rateText);
-        } else {
-            rate = 50;
-        }
-
-        //ensure mode has been set
-        if (mode != -1) {
-            //Get number of devices and initialise connection
-            bluetoothConnector = new BluetoothConnector(addedDevicesList, storageDirectory, rate, mode, this);
-        } else {
-            displayToast("Please select an output mode");
-        }
-
-    }
-
-    /**
-     * Start the streams!!
-     * @param v Button that was clicked. Only used for OS functionality
-     */
-    public void streamClick(View v) {
-        if (D) Log.d(TAG, "Starting Stream");
-        bluetoothConnector.runThreads();
-    }
-
-    /**
-     * Stop the streams!!
-     * @param v Button that was clicked. Only used for OS functionality
-     */
-    public void stopClick(View v) {
-        bluetoothConnector.stopThreads();
-    }
-
-    /**
-     * Changes the current display from set up to initiation mode. Should probably be a completely different Intent and
-     * given time, will be in the future
-     */
-    private void prepForConnection() {
-
-        //Remove the paired devices list
-        ((RelativeLayout) pairedDeviceListView.getParent()).removeView(pairedDeviceListView);
-
-        //Hide the setup buttons
-        hideSetupButtons();
-        //Lock in the location/device bindings
-        lockLocations();
-        //Reveal the initiation buttons.
-        showConnectionButtons();
-
-    }
-
-    /**
-     * Hide the setup buttons in preparation for initiation phase
-     */
-    private void hideSetupButtons() {
-        findViewById(R.id.clearButton).setVisibility(View.INVISIBLE);
-        findViewById(R.id.clearSelectedButton).setVisibility(View.INVISIBLE);
-        findViewById(R.id.finishButton).setVisibility(View.INVISIBLE);
-    }
-
-    /**
-     * Disable editing of location/device bindings
-     */
-    private void lockLocations() {
-        //Loop through all locations
-        for (int i = 0; i < locations.length; i++) {
-            //Set background colour to dark blue to show that it's locked in
-            TextView locView = (TextView) locationsGridView.getChildAt(i);
-            locView.setBackgroundResource(R.drawable.grid_background_locked);
-            //Text colour to white
-            locView.setTextColor(Color.WHITE);
-            //Let everyone know it's locked
-            locked = true;
-        }
-    }
-
-    /**
-     * Reveal the initiation buttons, should not be called without #hideSetupButtons()
-     */
-    private void showConnectionButtons() {
-        findViewById(R.id.connectButtonGroup).setVisibility(View.VISIBLE);
-        findViewById(R.id.rateGroup).setVisibility(View.VISIBLE);
-        findViewById(R.id.modeGroup).setVisibility(View.VISIBLE);
-    }
 
     /**
      * Menu button, currently no functionality.
-     * @param menu
-     * @return
+     * @param menu Menu item for the activity
+     * @return true
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -492,6 +351,7 @@ public class MainActivity extends Activity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_exit:
+                //Todo make better
                 finish();
                 return true;
 
@@ -507,14 +367,6 @@ public class MainActivity extends Activity {
      */
     private void displayToast(String s) {
         Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
-    }
-
-    /**
-     * Checks if external storage is available for read and write
-     */
-    private boolean isExternalStorageWritable() {
-        String state = Environment.getExternalStorageState();
-        return Environment.MEDIA_MOUNTED.equals(state);
     }
 
 }
