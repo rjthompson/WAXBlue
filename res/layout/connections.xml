@@ -122,16 +122,8 @@
                 android:onClick="connectClick"/>
 
         <Button
-                android:id="@+id/streamButton"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:text="@string/stream"
-                android:layout_toRightOf="@+id/connectButton"
-                android:onClick="streamClick"/>
-
-        <Button
                 android:id="@+id/stopButton"
-                android:layout_toRightOf="@+id/streamButton"
+                android:layout_toRightOf="@+id/connectButton"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:layout_marginLeft="5sp"

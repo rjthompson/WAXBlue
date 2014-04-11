@@ -2,6 +2,7 @@ package com.rt.WAXBlue;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -19,7 +20,7 @@ import static java.lang.Integer.parseInt;
  */
 public class ConnectionsActivity extends Activity {
 
-    private static final String TAG = "Connections Activity";          //Debugging tag
+    private static final String TAG = "Connections Activity";   //Debugging tag
     private static final boolean D = true;                      //Flag to turn on or off debug logging
 
     private int mode = 128;                                     //Output mode
@@ -27,8 +28,9 @@ public class ConnectionsActivity extends Activity {
     private File storageDirectory;                              //Directory to store output files
     private ArrayList<String> locationsList;
     private ArrayList<DeviceToBeAdded> addedDevicesList;
-
-    public void onCreate(Bundle savedInstanceState) {
+    private GridView locationsGridView;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.connections);
 
@@ -38,13 +40,43 @@ public class ConnectionsActivity extends Activity {
         init();
     }
 
+    //TODO FILL THESE IN
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 
     private void init(){
 
-        GridView locationsGridView = (GridView) findViewById(R.id.connectionLocationGridView);
+        locationsGridView = (GridView) findViewById(R.id.connectionLocationGridView);
         ArrayAdapter<String> locationDisplayArrayAdapter = new ArrayAdapter<String>(this, R.layout.centeredtext, locationsList);
         locationsGridView.setAdapter(locationDisplayArrayAdapter);
-
+        Log.d(TAG, locationsGridView.getChildCount()+ "");
         if (!isExternalStorageWritable()) {
             displayToast("Cannot Write to External Storage :(");
             finish();
@@ -108,6 +140,12 @@ public class ConnectionsActivity extends Activity {
      */
     public void connectClick(View v) {
 
+        for(int i = 0; i < locationsGridView.getChildCount(); i++){
+            TextView locationBox = (TextView) locationsGridView.getChildAt(i);
+            locationBox.setTextColor(Color.WHITE);
+            locationBox.setBackgroundResource(R.drawable.grid_background_locked);
+        }
+
         //get rate from text input box
         int rate;
         EditText rateEntry = (EditText) findViewById(R.id.rateEntry);
@@ -126,18 +164,11 @@ public class ConnectionsActivity extends Activity {
         } else {
             displayToast("Please select an output mode");
         }
-
-    }
-
-    /**
-     * Start the streams!!
-     *
-     * @param v Button that was clicked. Only used for OS functionality
-     */
-    public void streamClick(View v) {
+        //Set the streams running!
         if (D) Log.d(TAG, "Starting Stream");
         bluetoothConnector.runThreads();
     }
+
 
     /**
      * Stop the streams!!
