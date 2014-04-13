@@ -340,7 +340,6 @@ public class MainActivity extends Activity {
      * @param v
      */
     public void finishClick(View v) {
-        //todo change to move to next activity
         //Create confirmation dialogue
         new AlertDialog.Builder(this)
                 .setTitle("Finish")
@@ -355,7 +354,10 @@ public class MainActivity extends Activity {
                 .show();
     }
 
-    //todo doc
+
+    /**
+     * Creates and starts new activity to manage the connections with the devices.
+     */
     private void moveToConnections(){
         Intent intent = new Intent(this, ConnectionsActivity.class);
         intent.putParcelableArrayListExtra(ADDED_DEVICE_LIST, (ArrayList<DeviceToBeAdded>) addedDevicesList);

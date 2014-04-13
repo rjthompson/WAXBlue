@@ -3,11 +3,11 @@ package com.rt.WAXBlue;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.util.Log;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.Semaphore;
 
 /**
  * Class to handle and coordinate multiple device connections
@@ -18,8 +18,6 @@ public class BluetoothConnector{
     private static final boolean D = true;                     //Logging flag
 
     private DeviceConnection[] connections;                    //Array of all connections to be made
-    private CyclicBarrier ready;                               //Barrier to signal devices are ready to stream
-    private Context main;                                      //Context of the main activity
 
     /**
      *
@@ -28,12 +26,12 @@ public class BluetoothConnector{
      * @param rate Sampling rate (Hz)
      * @param mode Output format
      */
-    public BluetoothConnector(List<DeviceToBeAdded> devices, File storageDirectory, int rate, int mode, Context main) {
+    public BluetoothConnector(List<DeviceToBeAdded> devices, File storageDirectory, int rate, int mode) {
 
         if(D) Log.d(TAG, "Devices: " + devices.toString());
 
         //Initialise ready semaphore
-        ready = new CyclicBarrier(devices.size());
+        CyclicBarrier ready = new CyclicBarrier(devices.size());
 
         //Initialise connections array
         connections = new DeviceConnection[devices.size()];

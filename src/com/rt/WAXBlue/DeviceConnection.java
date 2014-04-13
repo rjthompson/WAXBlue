@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.Semaphore;
 
 /**
  * Attempt a new Bluetooth connection on a new thread

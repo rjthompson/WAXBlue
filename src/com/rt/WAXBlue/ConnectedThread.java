@@ -72,7 +72,7 @@ public class ConnectedThread implements Runnable {
                 "_" + c.get(Calendar.YEAR) + "_" + c.get(Calendar.HOUR_OF_DAY) + "_" + c.get(Calendar.MINUTE) + fType);
 
         //Instantiate thread to write to file concurrently
-        writerThread = new Writer(file, bigBuffer, sizes, writerDone);
+        writerThread = new Writer(file, bigBuffer, sizes);
 
         //Instantiate input and output streams.
         try {
