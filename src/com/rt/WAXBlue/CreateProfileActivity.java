@@ -18,6 +18,7 @@ public class CreateProfileActivity extends Activity {
 
     private Profile profile;                                            //The profile to be created
     private String name;                                                //The name of the profile to be created
+
     private ArrayList<String> locations;                                //Array list to hold the names of the locations
     private ArrayAdapter<String> locationsAdapter;                      //Array adapter for the display of the locations
     private ListView locationsListView;                                 //List view to display the locations as they are added/

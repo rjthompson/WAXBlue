@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <RelativeLayout
+            android:id="@+id/profileNameGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            >
+        <TextView
+                android:id="@+id/nameInputText"
+                android:text="@string/profile_name_input"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:textSize="18dp"
+                />
+        <EditText
+                android:id="@+id/nameEntry"
+                android:layout_height="wrap_content"
+                android:layout_width="200dp"
+                android:layout_toRightOf="@id/nameInputText"
+                android:inputType="text"
+                />
+    </RelativeLayout>
+
+    <Button
+            android:id="@+id/addLocationBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/add_location"
+            android:onClick="addLocation"
+            android:layout_below="@id/profileNameGroup"/>
+
+    <ListView
+            android:id="@+id/profileLocationsListView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
+    <RelativeLayout
+            android:id="@+id/editLocationsButtonGroup"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_below="@id/addLocationBtn"
+            android:gravity="center_horizontal">
+
+
+
+        <Button
+                android:id="@+id/editLocationButton"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="@string/edit"
+                android:layout_below="@id/profileLocationsListView"
+                android:onClick="editLocation"/>
+
+        <Button
+                android:id="@+id/deleteLocationButton"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="@string/delete"
+                android:layout_toRightOf="@id/editLocationButton"
+                android:onClick="deleteLocation"/>
+    </RelativeLayout>
+
+    <LinearLayout
+            android:id="@+id/createButtonGroup"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_alignParentBottom="true"
+            android:gravity="center_horizontal">
+
+        <Button
+                android:id="@+id/saveButton"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="@string/save"
+                android:layout_weight="1"
+                android:onClick="saveProfile"/>
+
+        <Button
+                android:id="@+id/cancelButton"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="@string/cancel"
+android:layout_weight="1"
+android:onClick="cancelProfile"/>
+    </LinearLayout>
+
+</RelativeLayout>

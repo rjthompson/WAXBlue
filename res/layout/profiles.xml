@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <TextView
+            android:id="@+id/profileHead"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:text="@string/profiles"
+            android:layout_alignParentTop="true"   />
+
+    <ListView
+            android:id="@+id/profileListView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/profileHead"/>
+
+    <TextView
+            android:id="@+id/locationsHead"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:text="@string/locations"
+            android:layout_below="@id/profileListView"
+            />
+
+    <ListView
+            android:id="@+id/currentProfileLocationListView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/locationsHead"/>
+
+    <LinearLayout
+            android:id="@+id/profilesButtonGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            >
+
+         <Button
+             android:id="@+id/launchButton"
+             android:layout_weight="1"
+             android:layout_width="0dp"
+             android:layout_height="wrap_content"
+             android:text="@string/launch"
+             android:onClick="launch"     />
+        <Button
+            android:id="@+id/createProfileButton"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/create_profile"
+            android:onClick="createProfile"/>
+
+        <Button
+                android:id="@+id/editProfileButton"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/edit_profile"
+                android:onClick="editProfile"/>
+
+
+
+    </LinearLayout>
+
+</RelativeLayout>

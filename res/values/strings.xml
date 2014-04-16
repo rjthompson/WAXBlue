@@ -15,4 +15,15 @@
     <string name="mode_binary">Binary</string>
     <string name="mode_binary_long">Binary\nLong</string>
     <string name="action_exit">Exit</string>
+    <string name="profile_name_input">Profile Name:</string>
+    <string name="add_location">Add Location</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete Selected</string>
+    <string name="edit">Edit Selected</string>
+    <string name="profiles">PROFILES</string>
+    <string name="launch">Launch</string>
+    <string name="create_profile">Create Profile</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="locations">Locations</string>
 </resources>
