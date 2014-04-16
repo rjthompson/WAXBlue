@@ -29,18 +29,22 @@ public class MainActivity extends Activity {
             = "com.rt.WAXBlue.addedDeviceList";                 //Name of added devices parcel for connection activity
     public static final String LOCATIONS_LIST
             = "com.rt.WAXBlue.locationsList";                   //Name of locationsList parcel for connection intent
+
     private GridView locationsGridView;                         //GridView to display the locations at which the devices will be attached
-    private List<DeviceToBeAdded> addedDevicesList;             //List of devices to be connected to
-    private List<String> pairedDevicesList;                     //List of device names paired with phone
     private ArrayList<String> locationsList;                    //ArrayList of locations to be passed to array adapter
-    private Set<BluetoothDevice> pairedDevicesSet;              //Set of devices paired with phone
+    private ArrayAdapter<String> locationDisplayArrayAdapter;   //Array Adapter for GridView
     private String[] locations = {                              //Array of locations to which the devices can be attached
             "Helmet", "Saddle", "Front Left", "Back Left",
             "Front Right", "Back Right"
     };
-    private ArrayList<Integer> usedLocations;                   //Array list to hold indices of locations already assigned
-    private ArrayAdapter<String> locationDisplayArrayAdapter;   //Array Adapter for GridView
+
+    private List<String> pairedDevicesList;                     //List of device names paired with phone
+    private Set<BluetoothDevice> pairedDevicesSet;              //Set of devices paired with phone
     private ArrayAdapter<String> deviceDisplayArrayAdapter;     //Paired devices array adapter
+
+    private ArrayList<Integer> usedLocations;                   //Array list to hold indices of locations already assigned
+    private List<DeviceToBeAdded> addedDevicesList;             //List of devices to be connected to
+
     private int selectedItem = -1;                              //Int representing which location has been selected
     private boolean locked = false;                             //Flag to indicate status of buttons
     private boolean selected = false;                           //Flag to indicate if any location is currently selected
