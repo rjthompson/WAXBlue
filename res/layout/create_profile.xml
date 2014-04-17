@@ -3,7 +3,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+        android:layout_margin="5dp">
 
     <RelativeLayout
             android:id="@+id/profileNameGroup"
@@ -27,45 +28,64 @@
                 />
     </RelativeLayout>
 
-    <Button
-            android:id="@+id/addLocationBtn"
+
+    <TextView
+            android:id="@+id/locationsHead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/add_location"
-            android:onClick="addLocation"
-            android:layout_below="@id/profileNameGroup"/>
+            android:text="@string/locations"
+            android:layout_below="@id/profileNameGroup"
+            android:textSize="20dp"
+            android:gravity="center_horizontal"
+
+            />
 
     <ListView
             android:id="@+id/profileLocationsListView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/locationsHead"
+            android:layout_above="@+id/addLocationBtn"
+            android:background="@drawable/grid_background_default"
             />
 
-    <RelativeLayout
-            android:id="@+id/editLocationsButtonGroup"
+    <Button
+            android:id="@id/addLocationBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/add_location"
+            android:layout_above="@+id/editLocationsButtonGroup"
+            android:onClick="addLocation"
+            />
+
+    <LinearLayout
+            android:id="@id/editLocationsButtonGroup"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:layout_below="@id/addLocationBtn"
-            android:gravity="center_horizontal">
+            android:layout_above="@+id/createButtonGroup"
+            android:gravity="center_horizontal"
+            >
 
 
 
         <Button
                 android:id="@+id/editLocationButton"
                 android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:text="@string/edit"
-                android:layout_below="@id/profileLocationsListView"
-                android:onClick="editLocation"/>
+                android:layout_weight="1"
+                android:onClick="editLocation"
+                />
 
         <Button
                 android:id="@+id/deleteLocationButton"
                 android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:text="@string/delete"
-                android:layout_toRightOf="@id/editLocationButton"
-                android:onClick="deleteLocation"/>
-    </RelativeLayout>
+                android:layout_weight="1"
+                android:onClick="deleteLocation"
+                />
+    </LinearLayout>
 
     <LinearLayout
             android:id="@+id/createButtonGroup"
@@ -77,7 +97,7 @@
         <Button
                 android:id="@+id/saveButton"
                 android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:text="@string/save"
                 android:layout_weight="1"
                 android:onClick="saveProfile"/>
@@ -85,10 +105,10 @@
         <Button
                 android:id="@+id/cancelButton"
                 android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:text="@string/cancel"
-android:layout_weight="1"
-android:onClick="cancelProfile"/>
+                android:layout_weight="1"
+                android:onClick="cancel"/>
     </LinearLayout>
 
 </RelativeLayout>

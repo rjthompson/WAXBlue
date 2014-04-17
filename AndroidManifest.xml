@@ -30,7 +30,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".EditProfileActivity"/>
-        <activity android:name=".CreateProfileActivity"/>
+        <activity android:name=".CreateProfileActivity"
+                  android:windowSoftInputMode="adjustPan|stateHidden">
+        </activity>
     </application>
 
 </manifest>

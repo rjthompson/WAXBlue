@@ -21,9 +21,9 @@
     <string name="save">Save</string>
     <string name="delete">Delete Selected</string>
     <string name="edit">Edit Selected</string>
-    <string name="profiles">PROFILES</string>
+    <string name="profiles">Profiles</string>
     <string name="launch">Launch</string>
     <string name="create_profile">Create Profile</string>
     <string name="edit_profile">Edit Profile</string>
-    <string name="locations">Locations</string>
+    <string name="locations"><u>Locations</u></string>
 </resources>

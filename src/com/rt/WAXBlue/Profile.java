@@ -14,6 +14,11 @@ public class Profile {
         this.locations = locations;
     }
 
+    public Profile(){
+        this.name = "";
+        this.locations = null;
+    }
+
     public String getName() {
         return name;
     }

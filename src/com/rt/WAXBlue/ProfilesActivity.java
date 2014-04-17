@@ -39,6 +39,7 @@ public class ProfilesActivity extends Activity {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.profiles);
 
 
         //Either open or create the profiles file
@@ -117,8 +118,10 @@ public class ProfilesActivity extends Activity {
      * Launch Activity to create a new profile.
      * @param v view element that was clicked. For OS use only.
      */
-    private void createProfile(View v){
+    public void createProfile(View v){
 
+        Intent intent = new Intent(this, CreateProfileActivity.class);
+        startActivity(intent);
     }
 
     /**
