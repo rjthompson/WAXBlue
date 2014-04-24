@@ -1,6 +1,7 @@
 package com.rt.WAXBlue;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,12 +18,13 @@ import java.util.ArrayList;
  */
 public class ProfilesActivity extends Activity {
 
-    private static final String TAG = "Profiles Activity";
+    private static final String TAG = "Profiles Activity";       //Logging tag
+    private static boolean D = true;                             //Logging flag
 
-    private static final String PROFILES = "WAX_Profiles.xml";  //name of file containing details of the profiles stored locally.
+    public static final String PROFILES = "WAX_Profiles.conf";  //name of file containing details of the profiles stored locally.
 
 
-
+    private ArrayList<Profile> profilesList;                //List of profiles read from profiles file
     private ArrayList<String> profileNames;                 //List of names of profiles currently held on device.
     private ArrayAdapter<String> profilesAdapter;           //Array Adapter for the display of the profile names.
     private ListView profilesListView;                      //List view to display the names of available profiles.
@@ -41,37 +43,58 @@ public class ProfilesActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profiles);
 
+        profileNames = new ArrayList<String>();
+        profilesList = new ArrayList<Profile>();
+
+        FileInputStream fis = null;
+        FileOutputStream fos = null;
 
         //Either open or create the profiles file
         try {
-            out = openFileOutput(PROFILES, MODE_APPEND);
-            in = openFileInput(PROFILES);
+            fis = this.openFileInput(PROFILES);
         } catch (FileNotFoundException e) {
-            Log.e(TAG, "Error with profile file: "+ e.getMessage());
+            Log.e(TAG, "Error load profiles file for reading: " + e.getMessage());
 
         }
 
-        int size = 0;
-        byte[] buffer = new byte[size];
-
-        try {
-            size = in.available();
-
-            if(size>0){
-                in.read(buffer);
-            }
-
-        } catch (IOException e) {
-            Log.e(TAG, "Failed Reading from profiles file: " + e.getMessage());
-        }
-
+        ObjectInputStream ois = null;
 
         //If file was opened parse contents
+        try {
+            ois = new ObjectInputStream(fis);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
 
         //populate list with available profiles
+        while(true){
+            try {
+                if (ois != null) {
+                    profilesList.add((Profile) ois.readObject());
+                }else{break;}
+            } catch (EOFException e) {
+                if(D) Log.d(TAG, "End of File");
+                try {
+                    ois.close();
+                } catch (IOException e1) {
+                    Log.e(TAG, e.getMessage());
+                }
+                break;
 
+            } catch (IOException e) {
+                Log.e(TAG, e.getMessage());
+            } catch (ClassNotFoundException e) {
+                Log.e(TAG, e.getMessage());
+            }
+        }
 
+        for(Profile p : profilesList){
+            profileNames.add(p.getName());
+        }
+        profilesListView = (ListView) findViewById(R.id.profileListView);
+        profilesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, profileNames);
+        profilesListView.setAdapter(profilesAdapter);
     }
 
     /**

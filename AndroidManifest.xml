@@ -29,7 +29,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".EditProfileActivity"/>
         <activity android:name=".CreateProfileActivity"
                   android:windowSoftInputMode="adjustPan|stateHidden">
         </activity>

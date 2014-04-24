@@ -1,10 +1,12 @@
 package com.rt.WAXBlue;
 
+import java.io.Serializable;
+
 /**
  * Author: Rob Thompson
  * Date: 16/04/2014
  */
-public class Profile {
+public class Profile implements Serializable{
 
     private String name;
     private String[] locations;

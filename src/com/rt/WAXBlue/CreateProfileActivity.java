@@ -2,6 +2,7 @@ package com.rt.WAXBlue;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.*;
 
+import java.io.*;
 import java.util.ArrayList;
 
 /**
@@ -24,6 +26,7 @@ public class CreateProfileActivity extends Activity {
     private static final String TAG = "Create Profile";
     private Profile profile;                                            //The profile to be created
     private String locationName;
+    private String fileName;                                            //Name of the file containing the profiles
 
     private ArrayList<String> locations;                                //Array list to hold the names of the locations
     private ArrayAdapter<String> locationsAdapter;                      //Array adapter for the display of the locations
@@ -37,14 +40,17 @@ public class CreateProfileActivity extends Activity {
         setContentView(R.layout.create_profile);
 
         //TODO fill in
-        init();
-
+        if(this.getIntent().getBooleanExtra("new", true)){
+            initFresh();
+        }else{
+            initEdit();
+        }
     }
 
     /**
      * Initialisation method
      */
-    private void init(){
+    protected void initFresh(){
 
         this.profile = new Profile();
 
@@ -67,6 +73,35 @@ public class CreateProfileActivity extends Activity {
             }
         });
 
+    }
+
+    private void initEdit(){
+
+        //todo
+        //Read from file
+
+        //todo
+        this.profile = new Profile();
+
+        selectedLocation = -1;
+
+        //todo
+        locations = new ArrayList<String>();
+
+        locationsListView = (ListView) findViewById(R.id.profileLocationsListView);
+        locationsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, locations);
+        locationsListView.setAdapter(locationsAdapter);
+
+        locationsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if (selectedLocation != -1) {
+                    locationsListView.getChildAt(selectedLocation).setBackgroundResource(Color.TRANSPARENT);
+                }
+                selectedLocation = i;
+                locationsListView.getChildAt(i).setBackgroundResource(R.drawable.grid_background_highlighted);
+            }
+        });
     }
 
     /**
@@ -186,12 +221,31 @@ public class CreateProfileActivity extends Activity {
      */
     public void saveProfile(View v){
 
-        String name = (String)((TextView)findViewById(R.id.nameEntry)).getText();
+        String name = ((EditText)(findViewById(R.id.nameEntry))).getText().toString();
         if(!name.equals("")){
             profile.setName(name);
-            profile.setLocations((String[])locations.toArray());
+            String[] locationsArray = new String[locations.size()];
+            int i = 0;
+            for(String l : locations){
+                locationsArray[i] = l;
+                i++;
+            }
+            profile.setLocations(locationsArray);
 
-            //WRITE TO FILE
+            FileOutputStream fos = null;
+            try {
+                fos = this.openFileOutput(ProfilesActivity.PROFILES, Context.MODE_PRIVATE);
+            } catch (FileNotFoundException e) {
+                Log.e(TAG, "Could not find profiles file");
+            }
+            try {
+                ObjectOutputStream os = new ObjectOutputStream(fos);
+                os.writeObject(profile);
+                os.close();
+            } catch (IOException e) {
+                Log.e(TAG, e.getMessage());
+            }
+            finish();
 
         }else{
             //prompt name entry
