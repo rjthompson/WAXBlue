@@ -40,7 +40,7 @@ public class CreateProfileActivity extends Activity {
         setContentView(R.layout.create_profile);
 
         //TODO fill in
-        if(this.getIntent().getBooleanExtra("new", true)){
+        if(this.getIntent().getBooleanExtra("edit", true)){
             initFresh();
         }else{
             initEdit();
@@ -221,6 +221,8 @@ public class CreateProfileActivity extends Activity {
      */
     public void saveProfile(View v){
 
+        //Todo check for duplicates
+
         String name = ((EditText)(findViewById(R.id.nameEntry))).getText().toString();
         if(!name.equals("")){
             profile.setName(name);
@@ -234,7 +236,7 @@ public class CreateProfileActivity extends Activity {
 
             FileOutputStream fos = null;
             try {
-                fos = this.openFileOutput(ProfilesActivity.PROFILES, Context.MODE_PRIVATE);
+                fos = this.openFileOutput(ProfilesActivity.PROFILES, Context.MODE_APPEND);
             } catch (FileNotFoundException e) {
                 Log.e(TAG, "Could not find profiles file");
             }

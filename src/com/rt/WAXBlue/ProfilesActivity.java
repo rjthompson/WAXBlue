@@ -1,16 +1,19 @@
 package com.rt.WAXBlue;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Author: Rob Thompson
@@ -38,10 +41,13 @@ public class ProfilesActivity extends Activity {
 
     private FileOutputStream out;
     private FileInputStream in;
+    private int selectedProfileIndex;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profiles);
+
+        selectedProfileIndex = -1;
 
         profileNames = new ArrayList<String>();
         profilesList = new ArrayList<Profile>();
@@ -88,6 +94,10 @@ public class ProfilesActivity extends Activity {
                 Log.e(TAG, e.getMessage());
             }
         }
+        locationsList = new ArrayList<String>();
+        locationsListView = (ListView) findViewById(R.id.currentProfileLocationListView);
+        locationsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, locationsList);
+        locationsListView.setAdapter(locationsAdapter);
 
         for(Profile p : profilesList){
             profileNames.add(p.getName());
@@ -95,6 +105,37 @@ public class ProfilesActivity extends Activity {
         profilesListView = (ListView) findViewById(R.id.profileListView);
         profilesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, profileNames);
         profilesListView.setAdapter(profilesAdapter);
+        profilesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                locationsList.clear();
+                if(selectedProfileIndex == i){
+
+                    profilesListView.getChildAt(i).setBackgroundResource(Color.TRANSPARENT);
+                    selectedProfileIndex = -1;
+
+                }else{
+                    if (selectedProfileIndex != -1) {
+
+                        profilesListView.getChildAt(selectedProfileIndex).setBackgroundResource(Color.TRANSPARENT);
+
+                    }
+                    profilesListView.getChildAt(i).setBackgroundResource(R.drawable.grid_background_highlighted);
+                    selectedProfileIndex = i;
+                    Profile selectedProfile = null;
+                    for(Profile p : profilesList){
+                        if(((TextView)profilesListView.getChildAt(i)).getText() == p.getName()){
+                            selectedProfile = p;
+                        }
+                    }
+                    if (selectedProfile != null) {
+                        String[] profileLocations = selectedProfile.getLocations();
+                        Collections.addAll(locationsList, profileLocations);
+                    }
+                    locationsAdapter.notifyDataSetChanged();
+                }
+            }
+        });
     }
 
     /**
@@ -144,6 +185,7 @@ public class ProfilesActivity extends Activity {
     public void createProfile(View v){
 
         Intent intent = new Intent(this, CreateProfileActivity.class);
+        intent.putExtra("edit", false);
         startActivity(intent);
     }
 
@@ -153,10 +195,16 @@ public class ProfilesActivity extends Activity {
      */
     private void editProfile(View v){
 
+        Intent intent = new Intent(this, CreateProfileActivity.class);
+        intent.putExtra("edit", true);
+        startActivity(intent);
     }
 
 
-
-
-
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        profilesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, profileNames);
+        profilesListView.setAdapter(profilesAdapter);
+    }
 }
