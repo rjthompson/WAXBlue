@@ -13,6 +13,7 @@ import android.widget.*;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Author: Rob Thompson
@@ -27,22 +28,27 @@ public class CreateProfileActivity extends Activity {
     private Profile profile;                                            //The profile to be created
     private String locationName;
     private String fileName;                                            //Name of the file containing the profiles
+    private boolean editting;                                           //Flag to indicate if this is an edit or create session.
+    private String initialName;                                         //Original name of profile if being editted.
 
     private ArrayList<String> locations;                                //Array list to hold the names of the locations
     private ArrayAdapter<String> locationsAdapter;                      //Array adapter for the display of the locations
     private ListView locationsListView;                                 //List view to display the locations as they are added/
 
     private int selectedLocation;
-
+    private ArrayList<Profile> profilesList;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_profile);
 
         //TODO fill in
-        if(this.getIntent().getBooleanExtra("edit", true)){
+        if(!this.getIntent().getBooleanExtra("edit", false)){
+            if(D) Log.d(TAG, "Creating New Profile");
             initFresh();
+
         }else{
+            if (D) Log.d(TAG, "Editing Profile");
             initEdit();
         }
     }
@@ -55,6 +61,8 @@ public class CreateProfileActivity extends Activity {
         this.profile = new Profile();
 
         selectedLocation = -1;
+        editting = false;
+        initialName = null;
 
         locations = new ArrayList<String>();
 
@@ -77,16 +85,24 @@ public class CreateProfileActivity extends Activity {
 
     private void initEdit(){
 
-        //todo
-        //Read from file
+        String pName = this.getIntent().getStringExtra("ProfileName");
+        ArrayList<String> pLocations = this.getIntent().getStringArrayListExtra("ProfileLocations");
+        String[] pLocationsArray = new String[pLocations.size()];
+        int i = 0;
+        for(String s : pLocations){
+            pLocationsArray[i] = s;
+            i++;
+        }
 
-        //todo
-        this.profile = new Profile();
+        this.profile = new Profile(pName, pLocationsArray);
 
         selectedLocation = -1;
+        editting = true;
+        initialName = pName;
 
-        //todo
-        locations = new ArrayList<String>();
+        ((EditText) findViewById(R.id.nameEntry)).setText(pName);
+
+        locations = pLocations;
 
         locationsListView = (ListView) findViewById(R.id.profileLocationsListView);
         locationsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, locations);
@@ -221,33 +237,57 @@ public class CreateProfileActivity extends Activity {
      */
     public void saveProfile(View v){
 
+        ArrayList<Profile> profilesList = new ArrayList<Profile>();
+        ArrayList<String> profileNames = new ArrayList<String>();
+
+
+        ProfilesActivity.manageConfig(this, profilesList, profileNames);
         //Todo check for duplicates
 
         String name = ((EditText)(findViewById(R.id.nameEntry))).getText().toString();
-        if(!name.equals("")){
-            profile.setName(name);
-            String[] locationsArray = new String[locations.size()];
-            int i = 0;
-            for(String l : locations){
-                locationsArray[i] = l;
-                i++;
-            }
-            profile.setLocations(locationsArray);
+        if (!name.equals("")) {
+            if(profileNames.contains(name) && !name.equals(initialName)){
+                Toast.makeText(this, "Profile already exists with this name", Toast.LENGTH_SHORT).show();
+            }else{
+                Profile old = null;
+                for(Profile p : profilesList){
+                    if (p.getName().equals(initialName))
 
-            FileOutputStream fos = null;
-            try {
-                fos = this.openFileOutput(ProfilesActivity.PROFILES, Context.MODE_APPEND);
-            } catch (FileNotFoundException e) {
-                Log.e(TAG, "Could not find profiles file");
+
+                        old = p;
+                }
+
+                profilesList.remove(old);
+
+                profile.setName(name);
+                String[] locationsArray = new String[locations.size()];
+                int i = 0;
+                for(String l : locations){
+                    locationsArray[i] = l;
+                    i++;
+                }
+                profile.setLocations(locationsArray);
+
+                profilesList.add(profile);
+
+                FileOutputStream fos = null;
+                try {
+                    fos = this.openFileOutput(ProfilesActivity.PROFILES, Context.MODE_PRIVATE);
+                } catch (FileNotFoundException e) {
+                    Log.e(TAG, "Could not find profiles file");
+                }
+                try {
+                    ObjectOutputStream os = new ObjectOutputStream(fos);
+
+                    for(Profile p : profilesList){
+                        os.writeObject(p);
+                    }
+                    os.close();
+                } catch (IOException e) {
+                    Log.e(TAG, e.getMessage());
+                }
+                finish();
             }
-            try {
-                ObjectOutputStream os = new ObjectOutputStream(fos);
-                os.writeObject(profile);
-                os.close();
-            } catch (IOException e) {
-                Log.e(TAG, e.getMessage());
-            }
-            finish();
 
         }else{
             //prompt name entry

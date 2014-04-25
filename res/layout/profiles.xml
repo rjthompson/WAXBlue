@@ -72,6 +72,15 @@
                 android:onClick="editProfile"
                 />
 
+        <Button
+                android:id="@+id/deleteProfileButton"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/delete_profile"
+                android:onClick="deleteProfile"
+                />
+
     </LinearLayout>
 
 </RelativeLayout>

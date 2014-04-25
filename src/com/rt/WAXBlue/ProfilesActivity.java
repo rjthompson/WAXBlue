@@ -1,15 +1,13 @@
 package com.rt.WAXBlue;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.*;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -42,12 +40,15 @@ public class ProfilesActivity extends Activity {
     private FileOutputStream out;
     private FileInputStream in;
     private int selectedProfileIndex;
+    private Profile selectedProfile;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profiles);
 
         selectedProfileIndex = -1;
+        selectedProfile = null;
+
 
         profileNames = new ArrayList<String>();
         profilesList = new ArrayList<Profile>();
@@ -55,9 +56,61 @@ public class ProfilesActivity extends Activity {
         FileInputStream fis = null;
         FileOutputStream fos = null;
 
+        manageConfig(this, profilesList, profileNames);
+
+
+        locationsList = new ArrayList<String>();
+        locationsListView = (ListView) findViewById(R.id.currentProfileLocationListView);
+        locationsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, locationsList);
+        locationsListView.setAdapter(locationsAdapter);
+
+
+
+        profilesListView = (ListView) findViewById(R.id.profileListView);
+        profilesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, profileNames);
+        profilesListView.setAdapter(profilesAdapter);
+        profilesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                locationsList.clear();
+                if(selectedProfileIndex == i){
+
+                    profilesListView.getChildAt(i).setBackgroundResource(Color.TRANSPARENT);
+                    selectedProfileIndex = -1;
+                    selectedProfile = null;
+
+                }else{
+                    if (selectedProfileIndex != -1) {
+
+                        profilesListView.getChildAt(selectedProfileIndex).setBackgroundResource(Color.TRANSPARENT);
+
+                    }
+                    profilesListView.getChildAt(i).setBackgroundResource(R.drawable.grid_background_highlighted);
+                    selectedProfileIndex = i;
+                    for(Profile p : profilesList){
+                        if(((TextView)profilesListView.getChildAt(i)).getText() == p.getName()){
+                            selectedProfile = p;
+                        }
+                    }
+                    if (selectedProfile != null) {
+                        String[] profileLocations = selectedProfile.getLocations();
+                        Collections.addAll(locationsList, profileLocations);
+                    }
+                    locationsAdapter.notifyDataSetChanged();
+                }
+            }
+        });
+    }
+
+    public static void manageConfig(Context c, ArrayList<Profile> profilesList, ArrayList<String> profileNames){
+
+        profilesList.clear();
+        profileNames.clear();
+
+        FileInputStream fis = null;
         //Either open or create the profiles file
         try {
-            fis = this.openFileInput(PROFILES);
+            fis = c.openFileInput(PROFILES);
         } catch (FileNotFoundException e) {
             Log.e(TAG, "Error load profiles file for reading: " + e.getMessage());
 
@@ -74,13 +127,15 @@ public class ProfilesActivity extends Activity {
 
 
         //populate list with available profiles
-        while(true){
+        while (true) {
             try {
                 if (ois != null) {
                     profilesList.add((Profile) ois.readObject());
-                }else{break;}
+                } else {
+                    break;
+                }
             } catch (EOFException e) {
-                if(D) Log.d(TAG, "End of File");
+                if (D) Log.d(TAG, "End of File");
                 try {
                     ois.close();
                 } catch (IOException e1) {
@@ -94,87 +149,27 @@ public class ProfilesActivity extends Activity {
                 Log.e(TAG, e.getMessage());
             }
         }
-        locationsList = new ArrayList<String>();
-        locationsListView = (ListView) findViewById(R.id.currentProfileLocationListView);
-        locationsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, locationsList);
-        locationsListView.setAdapter(locationsAdapter);
 
-        for(Profile p : profilesList){
+        for (Profile p : profilesList) {
             profileNames.add(p.getName());
         }
-        profilesListView = (ListView) findViewById(R.id.profileListView);
-        profilesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, profileNames);
-        profilesListView.setAdapter(profilesAdapter);
-        profilesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                locationsList.clear();
-                if(selectedProfileIndex == i){
 
-                    profilesListView.getChildAt(i).setBackgroundResource(Color.TRANSPARENT);
-                    selectedProfileIndex = -1;
-
-                }else{
-                    if (selectedProfileIndex != -1) {
-
-                        profilesListView.getChildAt(selectedProfileIndex).setBackgroundResource(Color.TRANSPARENT);
-
-                    }
-                    profilesListView.getChildAt(i).setBackgroundResource(R.drawable.grid_background_highlighted);
-                    selectedProfileIndex = i;
-                    Profile selectedProfile = null;
-                    for(Profile p : profilesList){
-                        if(((TextView)profilesListView.getChildAt(i)).getText() == p.getName()){
-                            selectedProfile = p;
-                        }
-                    }
-                    if (selectedProfile != null) {
-                        String[] profileLocations = selectedProfile.getLocations();
-                        Collections.addAll(locationsList, profileLocations);
-                    }
-                    locationsAdapter.notifyDataSetChanged();
-                }
+        try {
+            if (fis != null) {
+                fis.close();
             }
-        });
+        } catch (IOException e) {
+            Log.e(TAG, "Error closing file: "+e.getMessage());
+        }
     }
 
-    /**
-     *Get a list of previously created profiles from local storage.
-     * @return A list of previously created profiles.
-     */
-    private ArrayList<Profile> getProfiles(){
-
-        ArrayList<Profile> profiles = null;
-
-        return profiles;
-
-    }
-
-    /**
-     * Highlights a profile in the list
-     */
-    private void highlightProfile(){
-
-    }
-
-    /**
-     * Returns the locations associated with a profile passed as a parameter
-     * @param p The profile to query
-     * @return A List of the locations associated with the desired profile
-     */
-    private ArrayList<String> getCurrentLocations(Profile p){
-
-        ArrayList<String> locations = null;
-
-        return locations;
-
-    }
 
     /**
      * Launch main activity once profile has been selected
      * @param v view element that was clicked. For OS use only.
      */
     private void launch(View v){
+        //TODO
 
     }
 
@@ -193,18 +188,70 @@ public class ProfilesActivity extends Activity {
      * Launch Activity to edit an existing profile
      * @param v view element that was clicked. For OS use only.
      */
-    private void editProfile(View v){
+    public void editProfile(View v){
 
+        //TODO get this to work
         Intent intent = new Intent(this, CreateProfileActivity.class);
         intent.putExtra("edit", true);
+
+        intent.putExtra("ProfileName", selectedProfile.getName());
+        intent.putStringArrayListExtra("ProfileLocations", locationsList);
         startActivity(intent);
+
+    }
+
+    public void deleteProfile(View v){
+
+        if(selectedProfileIndex != -1){
+            ProfilesActivity.manageConfig(this, profilesList, profileNames);
+            Profile old = null;
+            for(Profile p : profilesList){
+                if(p.getName().equals(selectedProfile.getName())){
+                    old = p;
+
+                }
+            }
+
+            profilesList.remove(old);
+            profileNames.remove(old.getName());
+
+            FileOutputStream fos = null;
+            try {
+                fos = this.openFileOutput(ProfilesActivity.PROFILES, Context.MODE_PRIVATE);
+            } catch (FileNotFoundException e) {
+                Log.e(TAG, "Could not find profiles file");
+            }
+            try {
+                ObjectOutputStream os = new ObjectOutputStream(fos);
+
+                for (Profile p : profilesList) {
+                    os.writeObject(p);
+                }
+                os.close();
+            } catch (IOException e) {
+                Log.e(TAG, e.getMessage());
+            }
+
+            profilesListView.getChildAt(selectedProfileIndex).setBackgroundResource(Color.TRANSPARENT);
+            selectedProfileIndex = -1;
+            selectedProfile = null;
+
+            profilesAdapter.notifyDataSetChanged();
+            locationsList.clear();
+            locationsAdapter.notifyDataSetChanged();
+        }else{
+            Toast.makeText(this, "Nothing Selected", Toast.LENGTH_SHORT).show();
+        }
     }
 
 
     @Override
     protected void onRestart() {
         super.onRestart();
+        //TODO make this work, should update list on resuming activity from create activity.
+        manageConfig(this, profilesList, profileNames);
         profilesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, profileNames);
         profilesListView.setAdapter(profilesAdapter);
     }
+
 }
