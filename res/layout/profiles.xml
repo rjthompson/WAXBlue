@@ -36,10 +36,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/locationsHead"
+            android:layout_above="@+id/profilesButtonGroup"
             />
 
     <LinearLayout
-            android:id="@+id/profilesButtonGroup"
+            android:id="@id/profilesButtonGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -49,7 +50,7 @@
                 android:id="@+id/launchButton"
                 android:layout_weight="1"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:text="@string/launch"
                 android:onClick="launch"
                 />
@@ -58,7 +59,7 @@
                 android:id="@+id/createProfileButton"
                 android:layout_weight="1"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:text="@string/create_profile"
                 android:onClick="createProfile"
                 />
@@ -67,7 +68,7 @@
                 android:id="@+id/editProfileButton"
                 android:layout_weight="1"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:text="@string/edit_profile"
                 android:onClick="editProfile"
                 />
@@ -76,7 +77,7 @@
                 android:id="@+id/deleteProfileButton"
                 android:layout_weight="1"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:text="@string/delete_profile"
                 android:onClick="deleteProfile"
                 />

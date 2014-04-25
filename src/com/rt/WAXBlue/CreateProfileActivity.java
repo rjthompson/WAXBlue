@@ -43,7 +43,7 @@ public class CreateProfileActivity extends Activity {
         setContentView(R.layout.create_profile);
 
         //TODO fill in
-        if(!this.getIntent().getBooleanExtra("edit", false)){
+        if(!this.getIntent().getBooleanExtra(ProfilesActivity.EDIT_MESSAGE, false)){
             if(D) Log.d(TAG, "Creating New Profile");
             initFresh();
 
@@ -85,8 +85,8 @@ public class CreateProfileActivity extends Activity {
 
     private void initEdit(){
 
-        String pName = this.getIntent().getStringExtra("ProfileName");
-        ArrayList<String> pLocations = this.getIntent().getStringArrayListExtra("ProfileLocations");
+        String pName = this.getIntent().getStringExtra(ProfilesActivity.PROFILE_NAMES);
+        ArrayList<String> pLocations = this.getIntent().getStringArrayListExtra(ProfilesActivity.PROFILE_LOCATIONS);
         String[] pLocationsArray = new String[pLocations.size()];
         int i = 0;
         for(String s : pLocations){
@@ -252,8 +252,6 @@ public class CreateProfileActivity extends Activity {
                 Profile old = null;
                 for(Profile p : profilesList){
                     if (p.getName().equals(initialName))
-
-
                         old = p;
                 }
 

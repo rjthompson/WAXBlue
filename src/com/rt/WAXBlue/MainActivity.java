@@ -33,10 +33,11 @@ public class MainActivity extends Activity {
     private GridView locationsGridView;                         //GridView to display the locations at which the devices will be attached
     private ArrayList<String> locationsList;                    //ArrayList of locations to be passed to array adapter
     private ArrayAdapter<String> locationDisplayArrayAdapter;   //Array Adapter for GridView
-    private String[] locations = {                              //Array of locations to which the devices can be attached
+  /*  private String[] locations = {                              //Array of locations to which the devices can be attached
             "Helmet", "Saddle", "Front Left", "Back Left",
             "Front Right", "Back Right"
-    };
+    }; */
+    private String[] locations;
 
     private List<String> pairedDevicesList;                     //List of device names paired with phone
     private Set<BluetoothDevice> pairedDevicesSet;              //Set of devices paired with phone
@@ -54,6 +55,13 @@ public class MainActivity extends Activity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ArrayList<String> incomingLocations = this.getIntent().getStringArrayListExtra(ProfilesActivity.PROFILE_LOCATIONS);
+        int i = 0;
+        locations = new String[incomingLocations.size()];
+        for(String il : incomingLocations){
+            locations[i] = il;
+            i++;
+        }
         init();
     }
     //TODO FILL THESE IN

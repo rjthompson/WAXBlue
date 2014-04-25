@@ -23,7 +23,9 @@ public class ProfilesActivity extends Activity {
     private static boolean D = true;                             //Logging flag
 
     public static final String PROFILES = "WAX_Profiles.conf";  //name of file containing details of the profiles stored locally.
-
+    public static final String PROFILE_NAMES = "com.rt.WAXBlue.ProfileNames";
+    public static final String PROFILE_LOCATIONS = "com.rt.WAXBlue.ProfileLocations";
+    public static final String EDIT_MESSAGE = "com.rt.WAXBlue.edit";
 
     private ArrayList<Profile> profilesList;                //List of profiles read from profiles file
     private ArrayList<String> profileNames;                 //List of names of profiles currently held on device.
@@ -34,11 +36,6 @@ public class ProfilesActivity extends Activity {
     private ArrayAdapter<String> locationsAdapter;          //Array Adapter for the display of the locations.
     private ListView locationsListView;                     //List view to display the locations in the profile.
 
-    private Profile current;                                //Currently selected profile.
-
-
-    private FileOutputStream out;
-    private FileInputStream in;
     private int selectedProfileIndex;
     private Profile selectedProfile;
 
@@ -49,15 +46,10 @@ public class ProfilesActivity extends Activity {
         selectedProfileIndex = -1;
         selectedProfile = null;
 
-
         profileNames = new ArrayList<String>();
         profilesList = new ArrayList<Profile>();
 
-        FileInputStream fis = null;
-        FileOutputStream fos = null;
-
         manageConfig(this, profilesList, profileNames);
-
 
         locationsList = new ArrayList<String>();
         locationsListView = (ListView) findViewById(R.id.currentProfileLocationListView);
@@ -168,9 +160,14 @@ public class ProfilesActivity extends Activity {
      * Launch main activity once profile has been selected
      * @param v view element that was clicked. For OS use only.
      */
-    private void launch(View v){
-        //TODO
-
+    public void launch(View v){
+        if(selectedProfileIndex != -1){
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra(PROFILE_LOCATIONS, locationsList);
+            startActivity(intent);
+        }else{
+            Toast.makeText(this, "Nothing Selected", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -180,7 +177,7 @@ public class ProfilesActivity extends Activity {
     public void createProfile(View v){
 
         Intent intent = new Intent(this, CreateProfileActivity.class);
-        intent.putExtra("edit", false);
+        intent.putExtra(EDIT_MESSAGE, false);
         startActivity(intent);
     }
 
@@ -190,12 +187,11 @@ public class ProfilesActivity extends Activity {
      */
     public void editProfile(View v){
 
-        //TODO get this to work
         Intent intent = new Intent(this, CreateProfileActivity.class);
-        intent.putExtra("edit", true);
+        intent.putExtra(EDIT_MESSAGE, true);
 
-        intent.putExtra("ProfileName", selectedProfile.getName());
-        intent.putStringArrayListExtra("ProfileLocations", locationsList);
+        intent.putExtra(PROFILE_NAMES, selectedProfile.getName());
+        intent.putStringArrayListExtra(PROFILE_LOCATIONS, locationsList);
         startActivity(intent);
 
     }
@@ -211,10 +207,10 @@ public class ProfilesActivity extends Activity {
 
                 }
             }
-
             profilesList.remove(old);
-            profileNames.remove(old.getName());
-
+            if (old != null) {
+                profileNames.remove(old.getName());
+            }
             FileOutputStream fos = null;
             try {
                 fos = this.openFileOutput(ProfilesActivity.PROFILES, Context.MODE_PRIVATE);
@@ -244,12 +240,16 @@ public class ProfilesActivity extends Activity {
         }
     }
 
-
     @Override
     protected void onRestart() {
         super.onRestart();
+        selectedProfileIndex = -1;
+        selectedProfile = null;
         //TODO make this work, should update list on resuming activity from create activity.
         manageConfig(this, profilesList, profileNames);
+        locationsList.clear();
+        locationsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, locationsList);
+        locationsListView.setAdapter(locationsAdapter);
         profilesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, profileNames);
         profilesListView.setAdapter(profilesAdapter);
     }
