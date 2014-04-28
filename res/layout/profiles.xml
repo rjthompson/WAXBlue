@@ -3,8 +3,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-        >
+                android:layout_height="match_parent">
 
     <TextView
             android:id="@+id/profileHead"
@@ -12,7 +11,15 @@
             android:layout_width="match_parent"
             android:gravity="center"
             android:text="@string/profiles"
+            android:textSize="20sp"
             android:layout_alignParentTop="true"
+            android:textAllCaps="true"
+            android:background="@drawable/grid_background_locked"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:textColor="#FFFFFF"
+            android:padding="10dp"
             />
 
     <ListView
@@ -20,6 +27,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/profileHead"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/grid_background_default"
             />
 
     <TextView
@@ -29,6 +39,14 @@
             android:gravity="center"
             android:text="@string/locations"
             android:layout_below="@id/profileListView"
+            android:textAllCaps="true"
+            android:textSize="20sp"
+            android:background="@drawable/grid_background_locked"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:textColor="#FFFFFF"
+            android:padding="10dp"
+
             />
 
     <ListView
@@ -37,6 +55,9 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/locationsHead"
             android:layout_above="@+id/profilesButtonGroup"
+            android:background="@drawable/grid_background_default"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             />
 
     <LinearLayout

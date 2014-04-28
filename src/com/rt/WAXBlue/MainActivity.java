@@ -33,10 +33,6 @@ public class MainActivity extends Activity {
     private GridView locationsGridView;                         //GridView to display the locations at which the devices will be attached
     private ArrayList<String> locationsList;                    //ArrayList of locations to be passed to array adapter
     private ArrayAdapter<String> locationDisplayArrayAdapter;   //Array Adapter for GridView
-  /*  private String[] locations = {                              //Array of locations to which the devices can be attached
-            "Helmet", "Saddle", "Front Left", "Back Left",
-            "Front Right", "Back Right"
-    }; */
     private String[] locations;
 
     private List<String> pairedDevicesList;                     //List of device names paired with phone

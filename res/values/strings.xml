@@ -25,6 +25,6 @@
     <string name="launch">Launch</string>
     <string name="create_profile">Create Profile</string>
     <string name="edit_profile">Edit Profile</string>
-    <string name="locations"><u>Locations</u></string>
+    <string name="locations">Locations</string>
     <string name="delete_profile">Delete Profile</string>
 </resources>
