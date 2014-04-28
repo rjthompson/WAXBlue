@@ -80,7 +80,8 @@ public class ProfilesActivity extends Activity {
                     profilesListView.getChildAt(i).setBackgroundResource(R.drawable.grid_background_highlighted);
                     selectedProfileIndex = i;
                     for(Profile p : profilesList){
-                        if(((TextView)profilesListView.getChildAt(i)).getText() == p.getName()){
+                        String v = ((TextView)profilesListView.getChildAt(i)).getText().toString();
+                        if(v.equals(p.getName())){
                             selectedProfile = p;
                         }
                     }
@@ -204,7 +205,6 @@ public class ProfilesActivity extends Activity {
             for(Profile p : profilesList){
                 if(p.getName().equals(selectedProfile.getName())){
                     old = p;
-
                 }
             }
             profilesList.remove(old);
