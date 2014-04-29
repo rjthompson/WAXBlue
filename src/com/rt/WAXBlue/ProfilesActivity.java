@@ -188,12 +188,16 @@ public class ProfilesActivity extends Activity {
      */
     public void editProfile(View v){
 
+        if(selectedProfile != null){
         Intent intent = new Intent(this, CreateProfileActivity.class);
         intent.putExtra(EDIT_MESSAGE, true);
 
         intent.putExtra(PROFILE_NAMES, selectedProfile.getName());
         intent.putStringArrayListExtra(PROFILE_LOCATIONS, locationsList);
         startActivity(intent);
+        }else{
+            Toast.makeText(this, "Nothing Selected", Toast.LENGTH_SHORT).show();
+        }
 
     }
 

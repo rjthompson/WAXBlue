@@ -27,8 +27,6 @@ public class CreateProfileActivity extends Activity {
     private static final String TAG = "Create Profile";
     private Profile profile;                                            //The profile to be created
     private String locationName;
-    private String fileName;                                            //Name of the file containing the profiles
-    private boolean editting;                                           //Flag to indicate if this is an edit or create session.
     private String initialName;                                         //Original name of profile if being editted.
 
     private ArrayList<String> locations;                                //Array list to hold the names of the locations
@@ -36,7 +34,6 @@ public class CreateProfileActivity extends Activity {
     private ListView locationsListView;                                 //List view to display the locations as they are added/
 
     private int selectedLocation;
-    private ArrayList<Profile> profilesList;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,7 +58,6 @@ public class CreateProfileActivity extends Activity {
         this.profile = new Profile();
 
         selectedLocation = -1;
-        editting = false;
         initialName = null;
 
         locations = new ArrayList<String>();
@@ -97,7 +93,6 @@ public class CreateProfileActivity extends Activity {
         this.profile = new Profile(pName, pLocationsArray);
 
         selectedLocation = -1;
-        editting = true;
         initialName = pName;
 
         ((EditText) findViewById(R.id.nameEntry)).setText(pName);
@@ -184,6 +179,8 @@ public class CreateProfileActivity extends Activity {
                     })
                     .setNegativeButton("No", null)
                     .show();
+        }else {
+            Toast.makeText(this, "Nothing selected", Toast.LENGTH_SHORT).show();
         }
     }
 
