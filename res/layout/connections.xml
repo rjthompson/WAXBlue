@@ -2,13 +2,12 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingBottom="@dimen/activity_vertical_margin"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                tools:context=".MainActivity">
+                android:padding="10dp"
+                tools:context=".ConnectionsActivity"
+                android:background="#22496b">
 
-    <GridView
+
+<GridView
             android:id="@+id/connectionLocationGridView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -26,21 +25,20 @@
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:orientation="horizontal"
-            android:layout_marginBottom="5sp"
             android:gravity="center"
             android:layout_above="@+id/rateGroup"
+            android:background="@drawable/grid_background_default"
             >
 
 
         <RadioButton
                 android:id="@+id/text"
                 android:textSize="18sp"
-
                 android:layout_gravity="fill"
                 android:layout_width="wrap_content"
-                android:layout_height="50sp"
+                android:layout_height="50dp"
                 android:text="@string/mode_text"
-                android:layout_marginRight="5sp"
+                android:layout_marginRight="5dp"
                 android:onClick="onRadioButtonClicked"/>
 
         <RadioButton
@@ -49,9 +47,8 @@
                 android:layout_gravity="fill"
                 android:checked="true"
                 android:layout_width="wrap_content"
-                android:layout_height="50sp"
-                android:layout_marginRight="5sp"
-
+                android:layout_height="50dp"
+                android:layout_marginRight="5dp"
                 android:text="@string/mode_text_long"
                 android:onClick="onRadioButtonClicked"/>
 
@@ -60,8 +57,8 @@
                 android:textSize="18sp"
                 android:layout_gravity="fill"
                 android:layout_width="wrap_content"
-                android:layout_height="50sp"
-                android:layout_marginRight="5sp"
+                android:layout_height="50dp"
+                android:layout_marginRight="5dp"
 
                 android:text="@string/mode_binary"
                 android:onClick="onRadioButtonClicked"/>
@@ -82,22 +79,24 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:layout_above="@+id/connectButtonGroup"
-            android:layout_marginTop="5sp"
-            android:layout_marginBottom="25sp"
+            android:layout_marginTop="1dp"
+            android:layout_marginBottom="25dp"
+            android:background="@drawable/grid_background_default"
             >
 
         <TextView
                 android:id="@+id/rateLabel"
                 android:layout_width="wrap_content"
-                android:layout_height="50sp"
+                android:layout_height="50dp"
                 android:text="@string/rate"
+                android:gravity="center_vertical"
                 android:textSize="18sp"
                 />
 
         <EditText
                 android:id="@+id/rateEntry"
-                android:layout_height="50sp"
-                android:layout_width="75sp"
+                android:layout_height="50dp"
+                android:layout_width="75dp"
                 android:inputType="numberDecimal"
                 android:layout_toRightOf="@+id/rateLabel"
                 />
@@ -119,7 +118,9 @@
                 android:layout_marginRight="5sp"
                 android:text="@string/connect"
                 android:layout_toRightOf="@+id/rateEntry"
-                android:onClick="connectClick"/>
+                android:onClick="connectClick"
+                android:background="@android:drawable/btn_default"/>
+
 
         <Button
                 android:id="@+id/stopButton"
@@ -128,7 +129,8 @@
                 android:layout_width="wrap_content"
                 android:layout_marginLeft="5sp"
                 android:text="@string/stop"
-                android:onClick="stopClick"/>
+                android:onClick="stopClick"
+                android:background="@android:drawable/btn_default"/>
     </RelativeLayout>
 
 </RelativeLayout>
