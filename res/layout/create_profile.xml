@@ -4,17 +4,35 @@
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_margin="5dp">
+                android:layout_margin="10dp"
+        >
 
 
+        <TextView
+            android:id="@+id/createProfileHead"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:text="@string/create_profile"
+            android:textColor="#FFFFFF"
+            android:padding="10dp"
+            android:textSize="20sp"
+            android:background="@drawable/dark_blue_no_bottom_stroke"
+            android:textAllCaps="true"
+            android:gravity="center_horizontal"
+
+                />
 
         <EditText
                 android:id="@+id/nameEntry"
                 android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
+                android:padding="10dp"
+                android:textSize="20sp"
                 android:minWidth="200dp"
                 android:inputType="text"
+                android:layout_below="@id/createProfileHead"
                 android:hint="@string/profile_name_input"
+                android:background="@drawable/grid_background_default"
                 />
 
 
@@ -26,6 +44,10 @@
             android:layout_below="@id/nameEntry"
             android:textSize="20dp"
             android:gravity="center_horizontal"
+            android:textAllCaps="true"
+            android:textColor="#FFFFFF"
+            android:padding="10dp"
+            android:background="@drawable/dark_blue_no_top_or_bottom"
 
             />
 
@@ -36,8 +58,6 @@
             android:layout_below="@id/locationsHead"
             android:layout_above="@+id/addLocationBtn"
             android:background="@drawable/grid_background_default"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp"
             />
 
     <Button
@@ -91,7 +111,8 @@
                 android:layout_width="0dp"
                 android:text="@string/save"
                 android:layout_weight="1"
-                android:onClick="saveProfile"/>
+                android:onClick="saveProfile"
+                android:background="@android:drawable/btn_default"/>
 
         <Button
                 android:id="@+id/cancelButton"
@@ -99,7 +120,9 @@
                 android:layout_width="0dp"
                 android:text="@string/cancel"
                 android:layout_weight="1"
-                android:onClick="cancel"/>
+                android:onClick="cancel"
+                android:background="@android:drawable/btn_default"
+                />
     </LinearLayout>
 
 </RelativeLayout>
