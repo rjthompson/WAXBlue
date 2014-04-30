@@ -3,6 +3,7 @@ package com.rt.WAXBlue;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,16 +61,17 @@ public class BluetoothConnector{
     /**
      * Initialise all connections
      */
-    public void runThreads(){
+    public int runThreads(){
 
         if(D) Log.d(TAG, "Initialising connections");
         boolean success = false;
-        for (DeviceConnection connection : connections) {
+        int failID = -1;
+        for (int i = 0; i < connections.length; i++) {
             //Check each connection is successfully started
-            success = connection.init();
-            Log.d(TAG, "Connection for "+connection.getDeviceName()+" "+ (success ? "succeeded" : "failed"));
+            success = connections[i].init();
+            Log.d(TAG, "Connection for "+connections[i].getDeviceName()+" "+ (success ? "succeeded" : "failed"));
             if(!success){
-
+                failID = i;
                 break;
             }
         }
@@ -94,13 +96,13 @@ public class BluetoothConnector{
             //tear everything down.
             killConnections();
             //Todo Fail case in here
-
         }else{
             //If all connections succeed - go go go!
             for(DeviceConnection connection : connections){
                 connection.startConnection();
             }
         }
+        return failID;
     }
 
     /**

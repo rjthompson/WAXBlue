@@ -140,11 +140,7 @@ public class ConnectionsActivity extends Activity {
      */
     public void connectClick(View v) {
 
-        for(int i = 0; i < locationsGridView.getChildCount(); i++){
-            TextView locationBox = (TextView) locationsGridView.getChildAt(i);
-            locationBox.setTextColor(Color.WHITE);
-            locationBox.setBackgroundResource(R.drawable.grid_background_locked);
-        }
+
 
         //get rate from text input box
         int rate;
@@ -166,7 +162,19 @@ public class ConnectionsActivity extends Activity {
         }
         //Set the streams running!
         if (D) Log.d(TAG, "Starting Stream");
-        bluetoothConnector.runThreads();
+        //Run threads. Method returns -1 if success else index of failed connection
+        int id = bluetoothConnector.runThreads();
+        if(id == -1){
+            for (int i = 0; i < locationsGridView.getChildCount(); i++) {
+                TextView locationBox = (TextView) locationsGridView.getChildAt(i);
+                locationBox.setTextColor(Color.WHITE);
+                locationBox.setBackgroundResource(R.drawable.grid_background_locked);
+            }
+        }else{
+            TextView locationBox = (TextView) locationsGridView.getChildAt(id);
+            locationBox.setTextColor(Color.RED);
+            locationBox.setBackgroundResource(R.drawable.grid_background_default);
+        }
     }
 
 
