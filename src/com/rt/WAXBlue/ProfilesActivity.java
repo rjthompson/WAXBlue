@@ -93,6 +93,8 @@ public class ProfilesActivity extends Activity {
                 }
             }
         });
+
+
     }
 
     public static void manageConfig(Context c, ArrayList<Profile> profilesList, ArrayList<String> profileNames){
@@ -105,19 +107,21 @@ public class ProfilesActivity extends Activity {
         try {
             fis = c.openFileInput(PROFILES);
         } catch (FileNotFoundException e) {
-            Log.e(TAG, "Error load profiles file for reading: " + e.getMessage());
+            Log.e(TAG, "Error loading profiles file for reading: " + e.getMessage());
 
         }
 
         ObjectInputStream ois = null;
 
         //If file was opened parse contents
-        try {
-            ois = new ObjectInputStream(fis);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        if(fis!=null){
+            try {
+                ois = new ObjectInputStream(fis);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
+        }
 
         //populate list with available profiles
         while (true) {
@@ -154,6 +158,7 @@ public class ProfilesActivity extends Activity {
         } catch (IOException e) {
             Log.e(TAG, "Error closing file: "+e.getMessage());
         }
+
     }
 
 
@@ -189,12 +194,12 @@ public class ProfilesActivity extends Activity {
     public void editProfile(View v){
 
         if(selectedProfile != null){
-        Intent intent = new Intent(this, CreateProfileActivity.class);
-        intent.putExtra(EDIT_MESSAGE, true);
+            Intent intent = new Intent(this, CreateProfileActivity.class);
+            intent.putExtra(EDIT_MESSAGE, true);
 
-        intent.putExtra(PROFILE_NAMES, selectedProfile.getName());
-        intent.putStringArrayListExtra(PROFILE_LOCATIONS, locationsList);
-        startActivity(intent);
+            intent.putExtra(PROFILE_NAMES, selectedProfile.getName());
+            intent.putStringArrayListExtra(PROFILE_LOCATIONS, locationsList);
+            startActivity(intent);
         }else{
             Toast.makeText(this, "Nothing Selected", Toast.LENGTH_SHORT).show();
         }

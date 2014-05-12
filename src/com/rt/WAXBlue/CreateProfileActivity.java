@@ -179,9 +179,11 @@ public class CreateProfileActivity extends Activity {
                     })
                     .setNegativeButton("No", null)
                     .show();
+            selectedLocation = -1;
         }else {
             Toast.makeText(this, "Nothing selected", Toast.LENGTH_SHORT).show();
         }
+
     }
 
 
