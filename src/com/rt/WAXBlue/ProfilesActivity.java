@@ -25,7 +25,8 @@ public class ProfilesActivity extends Activity {
     public static final String PROFILES = "WAX_Profiles.conf";  //name of file containing details of the profiles stored locally.
     public static final String PROFILE_NAMES = "com.rt.WAXBlue.ProfileNames";
     public static final String PROFILE_LOCATIONS = "com.rt.WAXBlue.ProfileLocations";
-    public static final String EDIT_MESSAGE = "com.rt.WAXBlue.edit";
+    public static final String PROFILE_NAME = "com.rt.WAXBlue.ProfileName";
+    public static final String EDIT_MESSAGE = "com.rt.WAXBlue.Edit";
 
     private ArrayList<Profile> profilesList;                //List of profiles read from profiles file
     private ArrayList<String> profileNames;                 //List of names of profiles currently held on device.
@@ -170,6 +171,7 @@ public class ProfilesActivity extends Activity {
         if(selectedProfileIndex != -1){
             Intent intent = new Intent(this, MainActivity.class);
             intent.putExtra(PROFILE_LOCATIONS, locationsList);
+            intent.putExtra(PROFILE_NAME, selectedProfile.getName());
             startActivity(intent);
         }else{
             Toast.makeText(this, "Nothing Selected", Toast.LENGTH_SHORT).show();

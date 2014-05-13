@@ -9,8 +9,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.*;
 
-import java.io.File;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static java.lang.Integer.parseInt;
 
@@ -22,6 +25,7 @@ public class ConnectionsActivity extends Activity {
 
     private static final String TAG = "Connections Activity";   //Debugging tag
     private static final boolean D = true;                      //Flag to turn on or off debug logging
+    public static final String STORAGE_DIRECTORY = "com.rt.WAXBlue.Storage_Directory";
 
     private int mode = 128;                                     //Output mode
     private BluetoothConnector bluetoothConnector;              //Connector to set up and manage threads for BT devices
@@ -29,6 +33,8 @@ public class ConnectionsActivity extends Activity {
     private ArrayList<String> locationsList;
     private ArrayList<DeviceToBeAdded> addedDevicesList;
     private GridView locationsGridView;
+    private ArrayList<String> fileList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +79,7 @@ public class ConnectionsActivity extends Activity {
 
     private void init(){
 
+        fileList = new ArrayList<String>();
         locationsGridView = (GridView) findViewById(R.id.connectionLocationGridView);
         ArrayAdapter<String> locationDisplayArrayAdapter = new ArrayAdapter<String>(this, R.layout.centeredtext, locationsList);
         locationsGridView.setAdapter(locationDisplayArrayAdapter);
@@ -86,7 +93,6 @@ public class ConnectionsActivity extends Activity {
                 finish();
             }
         }
-
     }
 
     /**
@@ -95,8 +101,8 @@ public class ConnectionsActivity extends Activity {
      * @return true if successful
      */
     private boolean createDirectoryForStorage() {
-        //Default storage location is a directory called Data in downloads. Documents kept fucking around so wasn't used.
-        storageDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/Data/");
+        //Default storage location is a directory called Data in downloads. Documents kept screwing around so wasn't used.
+        storageDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/WAXBlue_Data/");
         return storageDirectory.exists() || storageDirectory.mkdirs();
     }
 
@@ -141,7 +147,7 @@ public class ConnectionsActivity extends Activity {
     public void connectClick(View v) {
 
 
-
+        findViewById(R.id.progress).setVisibility(View.VISIBLE);
         //get rate from text input box
         int rate;
         EditText rateEntry = (EditText) findViewById(R.id.rateEntry);
@@ -156,7 +162,7 @@ public class ConnectionsActivity extends Activity {
         //ensure mode has been set
         if (mode != -1) {
             //Get number of devices and initialise connection
-            bluetoothConnector = new BluetoothConnector(addedDevicesList, storageDirectory, rate, mode);
+            bluetoothConnector = new BluetoothConnector(addedDevicesList, storageDirectory, rate, mode, fileList);
         } else {
             displayToast("Please select an output mode");
         }
@@ -185,7 +191,69 @@ public class ConnectionsActivity extends Activity {
      */
     public void stopClick(View v) {
         bluetoothConnector.stopThreads();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Log.e(TAG, "Interrupted Sleep: " + e.getMessage());
+        }
+        zipItUp();
+        findViewById(R.id.progress).setVisibility(View.INVISIBLE);
+
     }
+
+    private void zipItUp(){
+        File[] fullFileList = storageDirectory.listFiles();
+        String profileName = this.getIntent().getStringExtra(ProfilesActivity.PROFILE_NAME);
+        profileName = profileName.replaceAll("\\s+", "");
+
+        Calendar c = Calendar.getInstance();
+        FileOutputStream fos = null;
+        //Month zero indexed in calendar class, increment for readability.
+        int month = c.get(Calendar.MONTH);
+        month++;
+        try {
+            fos = new FileOutputStream(storageDirectory.getPath() + "/log_" + profileName + "_" + c.get(Calendar.DATE) + "_" + month +
+                    "_" + c.get(Calendar.YEAR) + "_" + c.get(Calendar.HOUR_OF_DAY) + "_" + c.get(Calendar.MINUTE) + ".zip");
+        } catch (FileNotFoundException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        ZipOutputStream zos = new ZipOutputStream(fos);
+
+
+        for (File f : fullFileList) {
+            if (fileList.contains(f.getPath())) {
+                try {
+                    addToZip(f, zos);
+                    f.delete();
+                } catch (IOException e) {
+                    Log.e(TAG, e.getMessage());
+                }
+            }
+        }
+
+
+    }
+
+    public static void addToZip(File file, ZipOutputStream zos) throws IOException {
+
+        FileInputStream fis = new FileInputStream(file);
+
+        // we want the zipEntry's path to be a relative path that is relative
+        // to the directory being zipped, so chop off the rest of the path
+
+        ZipEntry zipEntry = new ZipEntry(file.getName());
+        zos.putNextEntry(zipEntry);
+
+        byte[] bytes = new byte[1024];
+        int length;
+        while ((length = fis.read(bytes)) >= 0) {
+            zos.write(bytes, 0, length);
+        }
+
+        zos.closeEntry();
+        fis.close();
+    }
+
 
     /**
      * Display string as toast

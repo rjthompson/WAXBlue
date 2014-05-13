@@ -6,6 +6,7 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.CyclicBarrier;
 
@@ -31,7 +32,7 @@ public class DeviceConnection{
     private int mode;                           //Mode of streaming for device
     private CyclicBarrier ready;                //Semaphore to indicate that all devices are ready to start streaming
     private Thread mConnected;                  //Thread to execute the connection
-
+    private ArrayList<String> fileList;
     /**
      *
      * @param waxDevice         Device to connect to
@@ -43,7 +44,7 @@ public class DeviceConnection{
      * @param ready             Semaphore to indicate device is ready to stream
      */
     public DeviceConnection(BluetoothDevice waxDevice, final int id, File storageDirectory, String location, int rate,
-                            int mode, CyclicBarrier ready) {
+                            int mode, CyclicBarrier ready, ArrayList<String> fileList) {
 
         if (D) Log.d(TAG, "Constructing device connection on: " + waxDevice.getName() + " ID: "+id);
 
@@ -54,6 +55,7 @@ public class DeviceConnection{
         this.storageDirectory = storageDirectory;
         this.location = location;
         this.deviceName = waxDevice.getName();
+        this.fileList = fileList;
         mSocket = null;
     }
 
@@ -90,7 +92,7 @@ public class DeviceConnection{
         }
 
         //Create connection runnable
-        connection = new ConnectedThread(mSocket, storageDirectory, location, rate, mode, ready);
+        connection = new ConnectedThread(mSocket, storageDirectory, location, rate, mode, ready, fileList);
         //Create thread using connection runnable
         mConnected = new Thread(connection);
         return true;

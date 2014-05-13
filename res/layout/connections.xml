@@ -7,7 +7,7 @@
                 android:background="#22496b">
 
 
-<GridView
+    <GridView
             android:id="@+id/connectionLocationGridView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -18,6 +18,17 @@
             android:gravity="fill"
             android:layout_marginBottom="5sp"
             android:layout_alignParentTop="true"
+            />
+
+    <ProgressBar
+            android:id="@+id/progress"
+            style="@android:style/Widget.ProgressBar.Large"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:layout_centerInParent="true"
+            android:visibility="invisible"
+            android:layout_below="@id/connectionLocationGridView"
             />
 
     <RadioGroup
@@ -134,3 +145,4 @@
     </RelativeLayout>
 
 </RelativeLayout>
+

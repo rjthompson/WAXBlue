@@ -27,4 +27,5 @@
     <string name="edit_profile">Edit Profile</string>
     <string name="locations">Locations</string>
     <string name="delete_profile">Delete Profile</string>
+    <string name="files">FILES</string>
 </resources>

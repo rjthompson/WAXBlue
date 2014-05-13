@@ -7,6 +7,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.concurrent.BrokenBarrierException;
@@ -38,7 +39,7 @@ public class ConnectedThread implements Runnable {
      * @param ready             Semaphore to synchronize starting of streams
      */
     public ConnectedThread(BluetoothSocket socket, File storageDirectory, String location, int rate, int mode,
-                           CyclicBarrier ready) {
+                           CyclicBarrier ready, ArrayList<String> fileList) {
 
         if (D) Log.d(TAG, "Creating ConnectedThread");
 
@@ -70,7 +71,9 @@ public class ConnectedThread implements Runnable {
         //Create file to be written to for logging device data. Filename format: "log_LOCATION_DATE_TIME"
         File file = new File(storageDirectory + "/log_" + location + "_" + c.get(Calendar.DATE) + "_" + month +
                 "_" + c.get(Calendar.YEAR) + "_" + c.get(Calendar.HOUR_OF_DAY) + "_" + c.get(Calendar.MINUTE) + fType);
-
+        synchronized(fileList){
+            fileList.add(file.getPath());
+        }
         //Instantiate thread to write to file concurrently
         writerThread = new Writer(file, bigBuffer, sizes);
 

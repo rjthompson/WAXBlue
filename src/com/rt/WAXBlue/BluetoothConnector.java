@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CyclicBarrier;
 
@@ -27,7 +28,7 @@ public class BluetoothConnector{
      * @param rate Sampling rate (Hz)
      * @param mode Output format
      */
-    public BluetoothConnector(List<DeviceToBeAdded> devices, File storageDirectory, int rate, int mode) {
+    public BluetoothConnector(List<DeviceToBeAdded> devices, File storageDirectory, int rate, int mode, ArrayList<String> fileList) {
 
         if(D) Log.d(TAG, "Devices: " + devices.toString());
 
@@ -48,7 +49,7 @@ public class BluetoothConnector{
             if (D) Log.d(TAG, "Attempting to create new Device Connection with " + device.getName() + " on " + d.getLocation());
 
             //Create a new connection and add it to the array.
-            connections[counter] = new DeviceConnection(device, counter, storageDirectory, d.getLocation(), rate, mode, ready);
+            connections[counter] = new DeviceConnection(device, counter, storageDirectory, d.getLocation(), rate, mode, ready, fileList);
 
             if (D) Log.d(TAG, "New Device Connections Created Successfully");
 

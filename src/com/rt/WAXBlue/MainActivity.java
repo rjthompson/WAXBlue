@@ -370,6 +370,7 @@ public class MainActivity extends Activity {
         Intent intent = new Intent(this, ConnectionsActivity.class);
         intent.putParcelableArrayListExtra(ADDED_DEVICE_LIST, (ArrayList<DeviceToBeAdded>) addedDevicesList);
         intent.putStringArrayListExtra(LOCATIONS_LIST, locationsList);
+        intent.putExtra(ProfilesActivity.PROFILE_NAME, this.getIntent().getStringExtra(ProfilesActivity.PROFILE_NAME));
         startActivity(intent);
     }
 
