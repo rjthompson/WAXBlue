@@ -190,7 +190,10 @@ public class ConnectionsActivity extends Activity {
      * @param v Button that was clicked. Only used for OS functionality
      */
     public void stopClick(View v) {
-        bluetoothConnector.stopThreads();
+        //TODO worry about this.
+        if(bluetoothConnector!=null){
+            bluetoothConnector.stopThreads();
+        }
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -229,6 +232,11 @@ public class ConnectionsActivity extends Activity {
                     Log.e(TAG, e.getMessage());
                 }
             }
+        }
+        try {
+            zos.close();
+        } catch (IOException e) {
+            Log.e(TAG, "Error closing zip stream");
         }
 
 

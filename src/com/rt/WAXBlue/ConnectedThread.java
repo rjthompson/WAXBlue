@@ -7,6 +7,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
@@ -147,7 +148,8 @@ public class ConnectedThread implements Runnable {
         //TODO make sure time to finish
 
         try {
-            outStream.write("\r\n".getBytes());
+            long time = System.currentTimeMillis();
+            outStream.write(("\r\n" + time).getBytes());
         } catch (IOException e) {
             Log.e(TAG, "Error writing to device: " + e.getMessage());
         }
@@ -226,8 +228,8 @@ public class ConnectedThread implements Runnable {
 
         //Once finished running close all streams
         try {
-            outStream.close();
-            inStream.close();
+                outStream.close();
+                inStream.close();
         } catch (IOException e) {
             Log.e(TAG, "Error closing streams");
         }
