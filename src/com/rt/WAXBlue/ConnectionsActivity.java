@@ -1,6 +1,8 @@
 package com.rt.WAXBlue;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -35,6 +37,8 @@ public class ConnectionsActivity extends Activity {
     private GridView locationsGridView;
     private ArrayList<String> fileList;
 
+    private boolean hasRun = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,15 +51,6 @@ public class ConnectionsActivity extends Activity {
     }
 
     //TODO FILL THESE IN
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
 
     @Override
     protected void onResume() {
@@ -65,6 +60,7 @@ public class ConnectionsActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+
     }
 
     @Override
@@ -75,6 +71,8 @@ public class ConnectionsActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        bluetoothConnector.killConnections();
+
     }
 
     private void init(){
@@ -147,16 +145,15 @@ public class ConnectionsActivity extends Activity {
     public void connectClick(View v) {
 
 
-        findViewById(R.id.progress).setVisibility(View.VISIBLE);
         //get rate from text input box
         int rate;
         EditText rateEntry = (EditText) findViewById(R.id.rateEntry);
         String rateText = rateEntry.getText().toString();
-        //If rate is unset, default to 50Hz
+        //If rate is unset, default to 80Hz
         if (!rateText.equals("")) {
             rate = parseInt(rateText);
         } else {
-            rate = 50;
+            rate = 80;
         }
 
         //ensure mode has been set
@@ -176,6 +173,11 @@ public class ConnectionsActivity extends Activity {
                 locationBox.setTextColor(Color.WHITE);
                 locationBox.setBackgroundResource(R.drawable.grid_background_locked);
             }
+            findViewById(R.id.progress).setVisibility(View.VISIBLE);
+            hasRun = true;
+            findViewById(R.id.stopButton).setEnabled(true);
+            findViewById(R.id.connectButton).setEnabled(false);
+
         }else{
             TextView locationBox = (TextView) locationsGridView.getChildAt(id);
             locationBox.setTextColor(Color.RED);
@@ -199,9 +201,32 @@ public class ConnectionsActivity extends Activity {
         } catch (InterruptedException e) {
             Log.e(TAG, "Interrupted Sleep: " + e.getMessage());
         }
-        zipItUp();
+        findViewById(R.id.stopButton).setEnabled(false);
+        //if has run
+        if(hasRun){
+            zipItUp();
+        }
         findViewById(R.id.progress).setVisibility(View.INVISIBLE);
 
+    }
+
+    /**
+     * Quits the active connection activity
+     * @param v
+     */
+    public void quitClick(View v){
+
+        new AlertDialog.Builder(this)
+                .setTitle("Finish")
+                .setMessage("Are you sure you want to quit this session?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show();
     }
 
     private void zipItUp(){
@@ -222,7 +247,7 @@ public class ConnectionsActivity extends Activity {
         }
         ZipOutputStream zos = new ZipOutputStream(fos);
 
-
+        Toast.makeText(this, "Zipping Files", Toast.LENGTH_LONG).show();
         for (File f : fullFileList) {
             if (fileList.contains(f.getPath())) {
                 try {
@@ -238,6 +263,7 @@ public class ConnectionsActivity extends Activity {
         } catch (IOException e) {
             Log.e(TAG, "Error closing zip stream");
         }
+        Toast.makeText(this, "Finished Zipping Files", Toast.LENGTH_LONG).show();
 
 
     }

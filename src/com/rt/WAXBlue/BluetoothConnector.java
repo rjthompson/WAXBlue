@@ -116,7 +116,7 @@ public class BluetoothConnector{
         }
     }
 
-    private void killConnections(){
+    public void killConnections(){
         for(DeviceConnection connection : connections){
             if(connection.getmSocket() != null){
                 try {

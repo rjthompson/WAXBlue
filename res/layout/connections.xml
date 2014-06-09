@@ -56,7 +56,6 @@
                 android:id="@+id/textLong"
                 android:textSize="18sp"
                 android:layout_gravity="fill"
-                android:checked="true"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
                 android:layout_marginRight="5dp"
@@ -66,6 +65,7 @@
         <RadioButton
                 android:id="@+id/binary"
                 android:textSize="18sp"
+                android:checked="true"
                 android:layout_gravity="fill"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
@@ -138,10 +138,21 @@
                 android:layout_toRightOf="@+id/connectButton"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
+                android:enabled="false"
                 android:layout_marginLeft="5sp"
                 android:text="@string/stop"
                 android:onClick="stopClick"
                 android:background="@android:drawable/btn_default"/>
+
+        <Button
+            android:id="@+id/quitButton"
+            android:layout_toRightOf="@id/stopButton"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="5sp"
+            android:text="@string/quit"
+            android:onClick="quitClick"
+            android:background="@android:drawable/btn_default"/>
     </RelativeLayout>
 
 </RelativeLayout>

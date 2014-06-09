@@ -22,7 +22,7 @@ public class ConnectedThread implements Runnable {
     private final Writer writerThread;                                        //Thread for writing concurrently
     private OutputStream outStream;                                           //Output stream for writing to device
     private BufferedInputStream inStream;                                     //Input stream for reading from device
-    private BluetoothSocket socket;                                           //Device socket
+    public BluetoothSocket socket;                                           //Device socket
     private int mode;                                                         //Recording mode (Binary or ASCII)
     private int rate;                                                         //Sample rate
     private volatile LinkedList<byte[]> bigBuffer = new LinkedList<byte[]>(); //Buffer to contain byte[] with data
@@ -228,18 +228,16 @@ public class ConnectedThread implements Runnable {
 
         //Once finished running close all streams
         try {
+                outStream.write("RESET\r\n".getBytes());
+                Thread.sleep(250);
                 outStream.close();
                 inStream.close();
         } catch (IOException e) {
             Log.e(TAG, "Error closing streams");
+        } catch (InterruptedException e) {
+            Log.e(TAG, "Interrupted Sleep");
         }
 
-        //Close the bluetooth connection.
-        try {
-            socket.close();
-        } catch (IOException e) {
-            Log.e(TAG, "Failed to close Socket: " + e.getMessage());
-        }
 
     }
 

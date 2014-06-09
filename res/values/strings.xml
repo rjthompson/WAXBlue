@@ -6,7 +6,7 @@
     <string name="finish">Finish</string>
     <string name="clearSelected">Clear Selected</string>
     <string name="clearAll">Clear All</string>
-    <string name="rate">Rate (50Hz)</string>
+    <string name="rate">Rate (80Hz)</string>
     <string name="connect">Connect</string>
     <string name="stream">Stream</string>
     <string name="stop">Stop</string>
@@ -28,4 +28,5 @@
     <string name="locations">Locations</string>
     <string name="delete_profile">Delete Profile</string>
     <string name="files">FILES</string>
+    <string name="quit">Quit</string>
 </resources>

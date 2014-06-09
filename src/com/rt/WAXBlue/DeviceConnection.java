@@ -114,6 +114,17 @@ public class DeviceConnection{
             connection.stopStream();
         }
 
+        //Close the bluetooth connection.
+        try {
+            Thread.sleep(1000);
+            connection.socket.close();
+        } catch (IOException e) {
+            Log.e(TAG, "Failed to close Socket: " + e.getMessage());
+        } catch (InterruptedException e) {
+            Log.e(TAG, "Interrupted Sleep");
+        }
+
+
     }
 
     /**

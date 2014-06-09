@@ -109,6 +109,7 @@ public class Writer extends Thread {
         //Write timestamp when finished.
         time = System.currentTimeMillis();
         try {
+
             fos.write(("\r\n" + time).getBytes());
         } catch (IOException e) {
             Log.e(TAG, "Write Error", e);

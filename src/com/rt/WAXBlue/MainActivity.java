@@ -84,6 +84,11 @@ public class MainActivity extends Activity {
     @Override
     protected void onStop() {
         super.onStop();
+        addedDevicesList.clear();
+        pairedDevicesList.clear();
+        usedLocations.clear();
+        deviceDisplayArrayAdapter.notifyDataSetChanged();
+        locationDisplayArrayAdapter.notifyDataSetChanged();
     }
 
     @Override
