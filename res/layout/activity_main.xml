@@ -54,6 +54,7 @@
                 android:id="@+id/clearSelectedButton"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
+                android:layout_marginRight="5sp"
                 android:text="@string/clearSelected"
                 android:layout_toRightOf="@+id/finishButton"
                 android:onClick="clearSelectedClick"
@@ -66,12 +67,23 @@
                 android:layout_toRightOf="@+id/clearSelectedButton"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:layout_marginLeft="5sp"
                 android:text="@string/clearAll"
                 android:onClick="clearClick"
                 android:visibility="visible"
                 android:background="@android:drawable/btn_default"
                 />
+
+        <Button
+                android:id="@+id/addPresetButton"
+                android:layout_below="@+id/clearSelectedButton"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="@string/addPreset"
+                android:onClick="addPreset"
+                android:visibility="visible"
+                android:background="@android:drawable/btn_default"
+                />
+
     </RelativeLayout>
 
 </RelativeLayout>

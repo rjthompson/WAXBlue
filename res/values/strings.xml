@@ -29,4 +29,5 @@
     <string name="delete_profile">Delete Profile</string>
     <string name="files">FILES</string>
     <string name="quit">Quit</string>
+    <string name="addPreset">Add Preset</string>
 </resources>

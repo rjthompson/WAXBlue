@@ -29,7 +29,7 @@ public class ConnectionsActivity extends Activity {
     private static final boolean D = true;                      //Flag to turn on or off debug logging
     public static final String STORAGE_DIRECTORY = "com.rt.WAXBlue.Storage_Directory";
 
-    private int mode = 128;                                     //Output mode
+    private int mode = 1;                                       //Output mode
     private BluetoothConnector bluetoothConnector;              //Connector to set up and manage threads for BT devices
     private File storageDirectory;                              //Directory to store output files
     private ArrayList<String> locationsList;
@@ -104,38 +104,7 @@ public class ConnectionsActivity extends Activity {
         return storageDirectory.exists() || storageDirectory.mkdirs();
     }
 
-    /**
-     * Set the functionality associated with selecting a mode for the devices.
-     *
-     * @param view View element that was clicked
-     */
-    public void onRadioButtonClicked(View view) {
-        // Is the button now checked?
-        boolean checked = ((RadioButton) view).isChecked();
 
-        // Check which radio button was clicked
-        switch (view.getId()) {
-            case R.id.text:
-                if (checked)
-                    mode = 0;
-                break;
-            case R.id.textLong:
-                if (checked)
-                    mode = 128;
-                break;
-            case R.id.binary:
-                if (checked)
-                    mode = 1;
-                break;
-           /* case R.id.binLong:                                       //Mode 129 not working atm :/
-                if (checked)
-                    mode = 129;
-                break;         */
-            default:
-                mode = -1;
-                break;
-        }
-    }
 
     /**
      * Initiate Bluetooth connection
@@ -144,18 +113,7 @@ public class ConnectionsActivity extends Activity {
      */
     public void connectClick(View v) {
 
-
-        //get rate from text input box
-        int rate;
-        EditText rateEntry = (EditText) findViewById(R.id.rateEntry);
-        String rateText = rateEntry.getText().toString();
-        //If rate is unset, default to 80Hz
-        if (!rateText.equals("")) {
-            rate = parseInt(rateText);
-        } else {
-            rate = 80;
-        }
-
+        int rate = 80;
         //ensure mode has been set
         if (mode != -1) {
             //Get number of devices and initialise connection

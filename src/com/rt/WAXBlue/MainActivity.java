@@ -14,10 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class MainActivity extends Activity {
 
@@ -346,6 +343,50 @@ public class MainActivity extends Activity {
             deviceDisplayArrayAdapter.notifyDataSetChanged();
             locationDisplayArrayAdapter.notifyDataSetChanged();
         }
+    }
+
+    public void addPreset(View v){
+
+        String[] pl = {"WAX9-A926", "WAX9-A920", "WAX9-ABAB", "WAX9-A90C", "WAX9-A950"};
+        ArrayList<String> presetList = new ArrayList<String>();
+        Collections.addAll(presetList, pl);
+
+            if(!pairedDevicesList.containsAll(presetList)){
+                displayToast("Please pair all devices");
+            }
+
+        for(BluetoothDevice d : pairedDevicesSet){
+            if(d.getName().equals(pl[0])){
+                addedDevicesList.add(new DeviceToBeAdded(d, "Left Fore White"));
+                String s = locationsList.get(0);
+                locationsList.set(0, s + "\n" + presetList.get(0));
+            }
+            else if (d.getName().equals(pl[1])) {
+                addedDevicesList.add(new DeviceToBeAdded(d, "Left Hind Red"));
+                String s = locationsList.get(1);
+                locationsList.set(1, s + "\n" + presetList.get(1));
+            }
+            else if (d.getName().equals(pl[2])) {
+                addedDevicesList.add(new DeviceToBeAdded(d, "Noseband Purple"));
+                String s = locationsList.get(2);
+                locationsList.set(2, s + "\n" + presetList.get(2));
+            }
+            else if (d.getName().equals(pl[3])) {
+                addedDevicesList.add(new DeviceToBeAdded(d, "Right Fore Blue"));
+                String s = locationsList.get(3);
+                locationsList.set(3, s + "\n" + presetList.get(3));
+            }
+            else if (d.getName().equals(pl[4])) {
+                addedDevicesList.add(new DeviceToBeAdded(d, "Right Hind Green"));
+                String s = locationsList.get(4);
+                locationsList.set(4, s + "\n" + presetList.get(4));
+            }
+
+        }
+        Integer[] ul = {0, 1, 2, 3, 4};
+        Collections.addAll(usedLocations, ul);
+        moveToConnections();
+
     }
 
     /**
