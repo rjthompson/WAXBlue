@@ -30,6 +30,7 @@ public class ConnectionsActivity extends Activity {
     public static final String STORAGE_DIRECTORY = "com.rt.WAXBlue.Storage_Directory";
 
     private int mode = 1;                                       //Output mode
+    private int rate = 100;                                     //Sampling Rate (Hard Coded :( )
     private BluetoothConnector bluetoothConnector;              //Connector to set up and manage threads for BT devices
     private File storageDirectory;                              //Directory to store output files
     private ArrayList<String> locationsList;
@@ -99,7 +100,7 @@ public class ConnectionsActivity extends Activity {
      * @return true if successful
      */
     private boolean createDirectoryForStorage() {
-        //Default storage location is a directory called Data in downloads. Documents kept screwing around so wasn't used.
+        //Default storage location is a directory called WAXBlue Data in downloads. Documents kept screwing around so wasn't used.
         storageDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/WAXBlue_Data/");
         return storageDirectory.exists() || storageDirectory.mkdirs();
     }
@@ -113,7 +114,6 @@ public class ConnectionsActivity extends Activity {
      */
     public void connectClick(View v) {
 
-        int rate = 80;
         //ensure mode has been set
         if (mode != -1) {
             //Get number of devices and initialise connection

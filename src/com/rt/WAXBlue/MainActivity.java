@@ -347,7 +347,7 @@ public class MainActivity extends Activity {
 
     public void addPreset(View v){
 
-        String[] pl = {"WAX9-A926", "WAX9-A920", "WAX9-ABAB", "WAX9-A90C", "WAX9-A950"};
+        String[] pl = {"WAX9-5620", "WAX9-5666", "WAX9-A904", "WAX9-573E", "WAX9-5642"};
         ArrayList<String> presetList = new ArrayList<String>();
         Collections.addAll(presetList, pl);
 

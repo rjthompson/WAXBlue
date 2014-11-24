@@ -73,16 +73,7 @@
                 android:background="@android:drawable/btn_default"
                 />
 
-        <Button
-                android:id="@+id/addPresetButton"
-                android:layout_below="@+id/clearSelectedButton"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:text="@string/addPreset"
-                android:onClick="addPreset"
-                android:visibility="visible"
-                android:background="@android:drawable/btn_default"
-                />
+
 
     </RelativeLayout>
 

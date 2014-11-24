@@ -20,7 +20,7 @@ public class DeviceConnection{
     private static final String TAG = "Device Connection";   //Logging tag
     private static final boolean D = true;                  //Logging flag
 
-    private static final String UUID_STRING = "00001101-0000-1000-8000-00805f9b34fb";     //UUID of device
+    public static final String UUID_STRING = "00001101-0000-1000-8000-00805f9b34fb";     //UUID of device
 
     private BluetoothDevice waxDevice;          //The device to connect to
     private BluetoothSocket mSocket;            //The devices Bluetooth socket
@@ -92,7 +92,7 @@ public class DeviceConnection{
         }
 
         //Create connection runnable
-        connection = new ConnectedThread(mSocket, storageDirectory, location, rate, mode, ready, fileList);
+        connection = new ConnectedThread(mSocket, storageDirectory, location, rate, mode, ready, fileList, waxDevice);
         //Create thread using connection runnable
         mConnected = new Thread(connection);
         return true;
