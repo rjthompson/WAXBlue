@@ -110,6 +110,7 @@ local.properties
 
 # TeXlipse plugin
 .texlipse
+
 ### Android template
 # Built application files
 *.apk
@@ -137,4 +138,3 @@ proguard/
 # Android Studio Navigation editor temp files
 .navigation/
 
-# Created by .ignore support plugin (hsz.mobi)
